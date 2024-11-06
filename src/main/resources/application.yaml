@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: pdf-ebook-converter
+vaadin:
+  launch-browser: true
