@@ -3,5 +3,5 @@ package com.almland.pdfebookconverter.application.port.aggregator
 import java.io.InputStream
 
 internal interface AggregateQueryPort {
-    fun uploadPdf(content: InputStream)
+    fun createFB2(content: InputStream): InputStream
 }

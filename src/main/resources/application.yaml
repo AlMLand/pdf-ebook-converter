@@ -1,5 +1,8 @@
 spring:
   application:
     name: pdf-ebook-converter
+  servlet:
+    multipart:
+      max-file-size: "10MB"
 vaadin:
   launch-browser: true
