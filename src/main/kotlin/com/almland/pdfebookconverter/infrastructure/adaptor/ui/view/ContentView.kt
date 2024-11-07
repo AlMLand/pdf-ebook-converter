@@ -37,20 +37,23 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
                 Upload(memory).apply {
                     maxFiles = 1
                     setAcceptedFileTypes(*ACCEPTED_FILE_TYPES)
-                    addSucceededListener {
-                        add(
-                            Anchor(
-                                StreamResource(
-                                    "download.fb2",
-                                    InputStreamFactory { aggregateQueryPort.createFB2(memory.inputStream) }
-                                ),
-                                null
-                            ).apply { add(Button("Download converted", VaadinIcon.DOWNLOAD.create())) }
-                        )
-                    }
+                    addSucceededListener { add(createAnchor(memory)) }
                 }
             }
 
             add(label, upload)
         }
+
+    private fun createAnchor(memory: MemoryBuffer): Anchor =
+        Anchor(createStreamResource(memory), null).apply {
+            add(Button("Download converted", VaadinIcon.DOWNLOAD.create()))
+        }
+
+    private fun createStreamResource(memory: MemoryBuffer): StreamResource =
+        StreamResource(
+            getFileName(memory),
+            InputStreamFactory { aggregateQueryPort.createFB2(memory.inputStream) }
+        )
+
+    private fun getFileName(memory: MemoryBuffer): String = "${memory.fileName.substringBeforeLast(".")}.fb2"
 }
