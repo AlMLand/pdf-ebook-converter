@@ -5,9 +5,9 @@ import com.almland.pdfebookconverter.infrastructure.adaptor.ui.MainLayout
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.html.Anchor
-import com.vaadin.flow.component.html.H3
-import com.vaadin.flow.component.icon.VaadinIcon
+import com.vaadin.flow.component.icon.VaadinIcon.DOWNLOAD
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.upload.Upload
@@ -25,6 +25,10 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         private val ACCEPTED_FILE_TYPES = arrayOf("application/pdf")
     }
 
+    private lateinit var upload: Upload
+    private lateinit var anchor: Anchor
+    private lateinit var target: ComboBox<FileTarget>
+
     override fun initContent(): Component =
         VerticalLayout().apply {
             setSizeFull()
@@ -32,28 +36,36 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
             justifyContentMode = FlexComponent.JustifyContentMode.CENTER
             defaultHorizontalComponentAlignment = FlexComponent.Alignment.CENTER
 
-            val label = H3("Pdf to fb2")
-            val upload = MemoryBuffer().let { memory ->
+            target = ComboBox<FileTarget>().apply {
+                placeholder = "convert pdf to"
+                setItems(FileTarget.entries)
+                addValueChangeListener { upload.isVisible = true }
+            }
+            upload = MemoryBuffer().let { memory ->
                 Upload(memory).apply {
                     maxFiles = 1
+                    isVisible = false
                     setAcceptedFileTypes(*ACCEPTED_FILE_TYPES)
-                    addSucceededListener { add(createAnchor(memory)) }
+                    addFileRemovedListener { anchor.removeFromParent() }
+                    addSucceededListener { add(createAnchor(target.value.target, memory)) }
                 }
             }
 
-            add(label, upload)
+            add(target, upload)
         }
 
-    private fun createAnchor(memory: MemoryBuffer): Anchor =
-        Anchor(createStreamResource(memory), null).apply {
-            add(Button("Download converted", VaadinIcon.DOWNLOAD.create()))
+    private fun createAnchor(target: String, memory: MemoryBuffer): Anchor =
+        Anchor(createStreamResource(target, memory), null).apply {
+            anchor = this
+            add(Button("Download converted", DOWNLOAD.create()))
         }
 
-    private fun createStreamResource(memory: MemoryBuffer): StreamResource =
+    private fun createStreamResource(target: String, memory: MemoryBuffer): StreamResource =
         StreamResource(
-            getFileName(memory),
-            InputStreamFactory { aggregateQueryPort.createFB2(memory.inputStream) }
+            getFileName(target, memory),
+            InputStreamFactory { aggregateQueryPort.create(target, memory.inputStream) }
         )
 
-    private fun getFileName(memory: MemoryBuffer): String = "${memory.fileName.substringBeforeLast(".")}.fb2"
+    private fun getFileName(target: String, memory: MemoryBuffer): String =
+        "${memory.fileName.substringBeforeLast(".")}.$target"
 }

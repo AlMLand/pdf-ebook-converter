@@ -7,6 +7,6 @@ import java.io.InputStream
 
 internal class PdfContentAggregator(private val creator: Creator) : AggregateQueryPort {
 
-    override fun createFB2(content: InputStream): InputStream =
+    override fun create(target: String, content: InputStream): InputStream =
         creator.create(PdfContent(content))
 }
