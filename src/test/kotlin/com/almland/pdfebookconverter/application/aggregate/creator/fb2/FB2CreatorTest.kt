@@ -1,6 +1,6 @@
 package com.almland.pdfebookconverter.application.aggregate.creator.fb2
 
-import com.almland.pdfebookconverter.domain.upload.PdfContent
+import com.almland.pdfebookconverter.domain.PdfContent
 import org.junit.jupiter.api.Test
 import org.springframework.core.io.ClassPathResource
 
@@ -14,6 +14,6 @@ internal class FB2CreatorTest {
 
     @Test
     fun `createFB2 `() {
-        FB2Creator().createFB2(PdfContent(ClassPathResource(PDF_THREE_IMAGES_TEST_PDF).inputStream))
+        FB2Creator().create(PdfContent(ClassPathResource(PDF_TEXT_IMAGE_TEST_PDF).inputStream))
     }
 }
