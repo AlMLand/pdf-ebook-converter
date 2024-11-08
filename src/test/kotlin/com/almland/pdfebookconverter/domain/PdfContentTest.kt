@@ -11,19 +11,26 @@ internal class PdfContentTest {
     }
 
     @Test
-    fun `after init from PdfContent instance, text and images variables in the instance are correct`() {
-        val pageIndex = 0
-
-        val expectedPageToOnPageIndexToImageSize = 1
-        val expectedImagesSize = 1
+    fun `after init from PdfContent instance, variables in the instance are correct`() {
+        val expectedKey = 0
+        val expectedSize = 1
+        val expectedPageIndex = 0
         val expectedText = "This is a test"
+        val expectedTitle = ""
+        val expectedFirstName = "Alex"
+        val expectedLastname = "Morland"
 
-        val pdfContent = PdfContent(ClassPathResource(PDF_TEXT_IMAGE_TEST_PDF).inputStream)
+        val actual = PdfContent(ClassPathResource(PDF_TEXT_IMAGE_TEST_PDF).inputStream)
 
-        with(pdfContent) {
+        assertThat(actual.description.title).isEqualTo(expectedTitle)
+        assertThat(actual.description.author.firstName).isEqualTo(expectedFirstName)
+        assertThat(actual.description.author.lastName).isEqualTo(expectedLastname)
+        assertThat(actual.pages.size).isEqualTo(expectedSize)
+        with((actual.pages as List)[0]) {
+            assertThat(pageIndex).isEqualTo(expectedPageIndex)
             assertThat(text.trim()).isEqualTo(expectedText)
-            assertThat(images.size).isEqualTo(expectedPageToOnPageIndexToImageSize)
-            assertThat(images[pageIndex]!!.size).isEqualTo(expectedImagesSize)
+            assertThat(images.keys.size).isEqualTo(expectedSize)
+            assertThat(images.keys).containsOnly(expectedKey)
         }
     }
 }

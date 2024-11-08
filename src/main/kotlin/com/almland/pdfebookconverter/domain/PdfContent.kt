@@ -1,13 +1,12 @@
 package com.almland.pdfebookconverter.domain
 
-import com.almland.pdfebookconverter.domain.PdfContentBuilderIntern.extractImages
-import com.almland.pdfebookconverter.domain.PdfContentBuilderIntern.extractText
-import java.awt.image.BufferedImage
+import com.almland.pdfebookconverter.domain.PdfContentBuilder.extractDescription
+import com.almland.pdfebookconverter.domain.PdfContentBuilder.extractPages
 import java.io.InputStream
 
-internal data class PdfContent(val content: InputStream) {
+internal data class PdfContent(private val content: InputStream) {
 
     private val bufferedContent = content.readAllBytes()
-    val text: String by lazy { extractText(bufferedContent) }
-    val images: Map<Int, MutableMap<Int, BufferedImage>> by lazy { extractImages(bufferedContent) }
+    val pages: Collection<Page> by lazy { extractPages(bufferedContent) }
+    val description: Description by lazy { extractDescription(bufferedContent) }
 }

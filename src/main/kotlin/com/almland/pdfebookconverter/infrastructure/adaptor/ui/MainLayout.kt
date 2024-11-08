@@ -9,7 +9,7 @@ internal class MainLayout : AppLayout() {
     init {
         addToNavbar(
             DrawerToggle(),
-            H1("Pdf converter")
+            H1("T converter")
         )
     }
 }
