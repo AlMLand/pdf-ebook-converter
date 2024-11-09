@@ -1,4 +1,4 @@
-package com.almland.pdfebookconverter.infrastructure.adaptor.ui.configuration
+package com.almland.pdfebookconverter.infrastructure.configuration
 
 import com.vaadin.flow.component.page.AppShellConfigurator
 import com.vaadin.flow.component.page.Push

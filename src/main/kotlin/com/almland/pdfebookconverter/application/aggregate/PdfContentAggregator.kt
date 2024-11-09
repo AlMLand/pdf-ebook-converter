@@ -5,7 +5,7 @@ import com.almland.pdfebookconverter.application.port.aggregator.AggregateQueryP
 import com.almland.pdfebookconverter.domain.PdfContent
 import java.io.InputStream
 
-internal class PdfContentAggregator(private val creator: Creator) : AggregateQueryPort {
+internal open class PdfContentAggregator(private val creator: Creator) : AggregateQueryPort {
 
     override fun create(target: String, content: InputStream): InputStream =
         creator.create(PdfContent(content))
