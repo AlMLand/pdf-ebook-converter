@@ -96,7 +96,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         Anchor(createStreamResource(inputStream, target, memory), null).apply {
             anchor = this
             setWidthFull()
-            add(Button("Download converted", DOWNLOAD.create()).apply { setWidthFull() })
+            add(Button("Download $target", DOWNLOAD.create()).apply { setWidthFull() })
         }
 
     private fun createStreamResource(inputStream: InputStream, target: String, memory: MemoryBuffer): StreamResource =
