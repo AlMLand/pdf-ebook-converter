@@ -14,7 +14,7 @@ import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.RO
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.SECTION
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.TITLE_INFO
 import com.almland.pdfebookconverter.domain.Page
-import com.almland.pdfebookconverter.domain.PdfContent
+import com.almland.pdfebookconverter.domain.PdfDocument
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import java.awt.image.BufferedImage
@@ -45,18 +45,18 @@ internal class FB2Creator : Creator {
     private lateinit var section: Element
 
     /**
-     * @param pdfContent domain object
-     * @return create an inputStream from document, a document will be created from PdfContent
+     * @param pdfDocument domain object
+     * @return create an inputStream from document, a document will be created from PdfDocument
      * document can contain text and images
      */
-    override fun create(pdfContent: PdfContent): InputStream =
+    override fun create(pdfDocument: PdfDocument): InputStream =
         getNewDocument().let { document ->
             document.createElement(ROOT.tag).apply {
                 setAttribute(XLINK_NAMESPACE_KEY, XLINK_NAMESPACE_VALUE)
                 document.appendChild(this)
                 root = this
             }
-            addDocumentDescription(pdfContent, document)
+            addDocumentDescription(pdfDocument, document)
             document.createElement(BODY.tag).apply {
                 root.appendChild(this)
                 body = this
@@ -66,7 +66,7 @@ internal class FB2Creator : Creator {
                 section = this
             }
 
-            fillDocument(pdfContent, document)
+            fillDocument(pdfDocument, document)
 
             documentToInputStream(document)
         }
@@ -75,20 +75,20 @@ internal class FB2Creator : Creator {
      * Add the document description like title, author first and last name
      * @param document this object is a framework witch will in this case contain common information over a book
      */
-    private fun addDocumentDescription(pdfContent: PdfContent, document: Document) {
+    private fun addDocumentDescription(pdfDocument: PdfDocument, document: Document) {
         document.createElement(DESCRIPTION.tag).also { description ->
             document.createElement(TITLE_INFO.tag).also { titleInfo ->
                 document.createElement(BOOK_TITLE.tag).apply {
-                    textContent = pdfContent.description.title
+                    textContent = pdfDocument.description.title
                     titleInfo.appendChild(this)
                 }
                 document.createElement(AUTHOR.tag).also { author ->
                     document.createElement(FIRST_NAME.tag).apply {
-                        textContent = pdfContent.description.author.firstName
+                        textContent = pdfDocument.description.author.firstName
                         author.appendChild(this)
                     }
                     document.createElement(LAST_NAME.tag).apply {
-                        textContent = pdfContent.description.author.lastName
+                        textContent = pdfDocument.description.author.lastName
                         author.appendChild(this)
                     }
                     titleInfo.appendChild(author)
@@ -101,11 +101,11 @@ internal class FB2Creator : Creator {
 
     /**
      * Inserts text and images into a document.
-     * @param pdfContent domain object
+     * @param pdfDocument domain object
      * @param document this object is a framework witch will contain text and images
      */
-    private fun fillDocument(pdfContent: PdfContent, document: Document) {
-        pdfContent.pages.forEachIndexed { pageIndex, page ->
+    private fun fillDocument(pdfDocument: PdfDocument, document: Document) {
+        pdfDocument.pages.forEachIndexed { pageIndex, page ->
             insertText(document, page.text)
             insertImage(document, page)
         }

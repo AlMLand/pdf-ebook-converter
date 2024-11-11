@@ -13,7 +13,7 @@ import org.springframework.test.util.ReflectionTestUtils
 import java.awt.image.BufferedImage
 import java.util.stream.Stream
 
-internal class PdfContentBuilderTest {
+internal class PdfDocumentBuilderTest {
 
     companion object {
         private const val PDF_TEXT_TEST_PDF = "pdf-text-test.pdf"
@@ -44,7 +44,7 @@ internal class PdfContentBuilderTest {
 
         val content = ClassPathResource(PDF_TEXT_TEST_PDF).contentAsByteArray
 
-        val actual = PdfContentBuilder.extractDescription(content)
+        val actual = PdfDocumentBuilder.extractDescription(content)
 
         with(actual) {
             assertThat(author.firstName).isEqualTo(expectedFirstname)
@@ -62,7 +62,7 @@ internal class PdfContentBuilderTest {
     fun `extractPages, scenario describe above`(file: String, expectedSize: Int) {
         val content = ClassPathResource(file).contentAsByteArray
 
-        val actual = PdfContentBuilder.extractPages(content)
+        val actual = PdfDocumentBuilder.extractPages(content)
 
         assertThat(actual.size).isEqualTo(expectedSize)
     }
@@ -79,7 +79,7 @@ internal class PdfContentBuilderTest {
         val textStripper = PDFTextStripper().apply { sortByPosition = true; addMoreFormatting = true }
 
         val actual = ReflectionTestUtils.invokeMethod<String>(
-            PdfContentBuilder,
+            PdfDocumentBuilder,
             "extractText",
             pdfDocument,
             textStripper,
@@ -107,7 +107,7 @@ internal class PdfContentBuilderTest {
         val pdfDocument = Loader.loadPDF(ClassPathResource(PDF_THREE_IMAGES_TEST_PDF).file)
 
         val actual = ReflectionTestUtils.invokeMethod<Map<Int, BufferedImage>>(
-            PdfContentBuilder,
+            PdfDocumentBuilder,
             "extractImages",
             pdfDocument,
             pageIndex

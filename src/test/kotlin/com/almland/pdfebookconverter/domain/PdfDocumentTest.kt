@@ -4,14 +4,14 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.core.io.ClassPathResource
 
-internal class PdfContentTest {
+internal class PdfDocumentTest {
 
     companion object {
         private const val PDF_TEXT_IMAGE_TEST_PDF = "pdf-text-image-test.pdf"
     }
 
     @Test
-    fun `after init from PdfContent instance, variables in the instance are correct`() {
+    fun `after init from PdfDocument instance, variables in the instance are correct`() {
         val expectedKey = 0
         val expectedSize = 1
         val expectedPageIndex = 0
@@ -20,7 +20,7 @@ internal class PdfContentTest {
         val expectedFirstName = "Alex"
         val expectedLastname = "Morland"
 
-        val actual = PdfContent(ClassPathResource(PDF_TEXT_IMAGE_TEST_PDF).inputStream)
+        val actual = PdfDocument(ClassPathResource(PDF_TEXT_IMAGE_TEST_PDF).inputStream)
 
         assertThat(actual.description.title).isEqualTo(expectedTitle)
         assertThat(actual.description.author.firstName).isEqualTo(expectedFirstName)

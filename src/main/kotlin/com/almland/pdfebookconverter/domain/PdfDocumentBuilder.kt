@@ -6,7 +6,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.text.PDFTextStripper
 import java.awt.image.BufferedImage
 
-internal object PdfContentBuilder {
+internal object PdfDocumentBuilder {
 
     private const val DEFAULT = ""
     private const val DELIMITER = " "
