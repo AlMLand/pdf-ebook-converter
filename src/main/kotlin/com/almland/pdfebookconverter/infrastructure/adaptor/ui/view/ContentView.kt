@@ -8,8 +8,11 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.combobox.ComboBoxVariant
 import com.vaadin.flow.component.html.Anchor
+import com.vaadin.flow.component.html.Div
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.VaadinIcon.DOWNLOAD
 import com.vaadin.flow.component.orderedlayout.FlexComponent
+import com.vaadin.flow.component.orderedlayout.Scroller
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.progressbar.ProgressBar
 import com.vaadin.flow.component.upload.Upload
@@ -30,6 +33,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
 
     private lateinit var upload: Upload
     private lateinit var anchor: Anchor
+    private lateinit var divSuggestion: Div
     private lateinit var layout: VerticalLayout
     private lateinit var progressBar: ProgressBar
     private lateinit var comboBox: ComboBox<FileTarget>
@@ -60,8 +64,14 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
                         setWidthFull()
                         isVisible = false
                         setAcceptedFileTypes(*ACCEPTED_FILE_TYPES)
-                        addFileRemovedListener { anchor.removeFromParent() }
-                        addSucceededListener { createDownloadProgressBar(); createDownloadLink(memory) }
+                        addSucceededListener {
+                            createDownloadProgressBar()
+                            createDownloadLink(memory)
+                        }
+                        addFileRemovedListener {
+                            anchor.removeFromParent()
+                            if (isDivSuggestionInitialized()) divSuggestion.removeFromParent()
+                        }
                     }
                 }
 
@@ -71,26 +81,42 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
             add(form)
         }
 
+    private fun isDivSuggestionInitialized(): Boolean = this::divSuggestion.isInitialized
+
     private fun createDownloadProgressBar() {
         ProgressBar().apply {
-            layout.add(this)
             setWidthFull()
             progressBar = this
             isIndeterminate = true
+            layout.add(this)
         }
     }
 
     private fun createDownloadLink(memory: MemoryBuffer) {
         ui.ifPresent {
             thread {
-                val inputStream = aggregateQueryPort.create(comboBox.value.target, memory.inputStream)
+                val target = comboBox.value.target
+                val fileName = getFileName(target, memory)
+                val suggestions = aggregateQueryPort.getSuggestions(fileName)
+                val inputStream = aggregateQueryPort.create(fileName, target, memory.inputStream)
                 it.access {
-                    layout.add(createAnchor(inputStream, comboBox.value.target, memory))
+                    layout.add(createAnchor(inputStream, target, memory))
+                    if (suggestions.isNotEmpty()) layout.add(createSuggestion(suggestions))
                     progressBar.removeFromParent()
                 }
             }
         }
     }
+
+    private fun createSuggestion(suggestions: Collection<String>): Component =
+        Scroller(
+            Div(
+                fillWithContent(suggestions)
+            ).apply { maxHeight = "15em"; divSuggestion = this }
+        ).apply { scrollDirection = Scroller.ScrollDirection.VERTICAL }
+
+    private fun fillWithContent(suggestions: Collection<String>): Component =
+        VerticalLayout(*suggestions.map { Span(it).apply { setWidthFull() } }.toTypedArray())
 
     private fun createAnchor(inputStream: InputStream, target: String, memory: MemoryBuffer): Anchor =
         Anchor(createStreamResource(inputStream, target, memory), null).apply {

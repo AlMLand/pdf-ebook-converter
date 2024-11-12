@@ -4,6 +4,7 @@ import com.almland.pdfebookconverter.application.aggregate.PdfDocumentAggregator
 import com.almland.pdfebookconverter.application.aggregate.creator.Creator
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Creator
 import com.almland.pdfebookconverter.application.port.aggregator.AggregateQueryPort
+import com.almland.pdfebookconverter.application.port.outbound.AIPort
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,6 +16,6 @@ internal class PdfDocumentAggregatorConfiguration {
     fun fB2Creator(): Creator = FB2Creator()
 
     @Bean
-    fun pdfDocumentAggregator(@Qualifier("fB2Creator") fB2Creator: Creator): AggregateQueryPort =
-        PdfDocumentAggregator(fB2Creator)
+    fun pdfDocumentAggregator(aiPort: AIPort, @Qualifier("fB2Creator") fB2Creator: Creator): AggregateQueryPort =
+        PdfDocumentAggregator(aiPort, fB2Creator)
 }
