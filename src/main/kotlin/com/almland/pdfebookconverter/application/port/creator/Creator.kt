@@ -1,4 +1,4 @@
-package com.almland.pdfebookconverter.application.aggregate.creator
+package com.almland.pdfebookconverter.application.port.creator
 
 import com.almland.pdfebookconverter.domain.PdfDocument
 import java.io.InputStream

@@ -20,7 +20,7 @@ internal class PdfDocumentTest {
         val expectedFirstName = "Alex"
         val expectedLastname = "Morland"
 
-        val actual = PdfDocument(ClassPathResource(PDF_TEXT_IMAGE_TEST_PDF).inputStream)
+        val actual = PdfDocument(FileTarget.FB2, ClassPathResource(PDF_TEXT_IMAGE_TEST_PDF).inputStream)
 
         assertThat(actual.description.title).isEqualTo(expectedTitle)
         assertThat(actual.description.author.firstName).isEqualTo(expectedFirstName)

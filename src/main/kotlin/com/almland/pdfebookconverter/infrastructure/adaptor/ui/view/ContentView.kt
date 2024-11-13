@@ -69,7 +69,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
                             createDownloadLink(memory)
                         }
                         addFileRemovedListener {
-                            anchor.removeFromParent()
+                            if (isAnchorInitialized()) anchor.removeFromParent()
                             if (isDivSuggestionInitialized()) divSuggestion.removeFromParent()
                         }
                     }
@@ -80,6 +80,8 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
 
             add(form)
         }
+
+    private fun isAnchorInitialized(): Boolean = this::anchor.isInitialized
 
     private fun isDivSuggestionInitialized(): Boolean = this::divSuggestion.isInitialized
 

@@ -1,6 +1,5 @@
 package com.almland.pdfebookconverter.application.aggregate.creator.fb2
 
-import com.almland.pdfebookconverter.application.aggregate.creator.Creator
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.AUTHOR
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.BINARY
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.BODY
@@ -13,6 +12,7 @@ import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.PA
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.ROOT
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.SECTION
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.TITLE_INFO
+import com.almland.pdfebookconverter.application.port.creator.Creator
 import com.almland.pdfebookconverter.domain.Page
 import com.almland.pdfebookconverter.domain.PdfDocument
 import org.w3c.dom.Document
