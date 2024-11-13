@@ -28,6 +28,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
 
     companion object {
         const val PATH = ""
+        private const val CONTENT_CREATION_THREAD = "createContent"
         private val ACCEPTED_FILE_TYPES = arrayOf("application/pdf")
     }
 
@@ -96,7 +97,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
 
     private fun createDownloadLink(memory: MemoryBuffer) {
         ui.ifPresent {
-            thread {
+            thread(name = CONTENT_CREATION_THREAD) {
                 val target = comboBox.value.target
                 val fileName = getFileName(target, memory)
                 val suggestions = aggregateQueryPort.getSuggestions(fileName)
