@@ -34,7 +34,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
 
     private lateinit var upload: Upload
     private lateinit var anchor: Anchor
-    private lateinit var divSuggestion: Div
+    private lateinit var scroller: Scroller
     private lateinit var layout: VerticalLayout
     private lateinit var progressBar: ProgressBar
     private lateinit var comboBox: ComboBox<FileTarget>
@@ -71,7 +71,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
                         }
                         addFileRemovedListener {
                             if (isAnchorInitialized()) anchor.removeFromParent()
-                            if (isDivSuggestionInitialized()) divSuggestion.removeFromParent()
+                            if (isScrollerInitialized()) scroller.removeFromParent()
                         }
                     }
                 }
@@ -84,7 +84,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
 
     private fun isAnchorInitialized(): Boolean = this::anchor.isInitialized
 
-    private fun isDivSuggestionInitialized(): Boolean = this::divSuggestion.isInitialized
+    private fun isScrollerInitialized(): Boolean = this::scroller.isInitialized
 
     private fun createDownloadProgressBar() {
         ProgressBar().apply {
@@ -115,8 +115,8 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         Scroller(
             Div(
                 fillWithContent(suggestions)
-            ).apply { maxHeight = "15em"; divSuggestion = this }
-        ).apply { scrollDirection = Scroller.ScrollDirection.VERTICAL }
+            ).apply { maxHeight = "15em" }
+        ).apply { scrollDirection = Scroller.ScrollDirection.VERTICAL; scroller = this }
 
     private fun fillWithContent(suggestions: Collection<String>): Component =
         VerticalLayout(*suggestions.map { Span(it).apply { setWidthFull() } }.toTypedArray())
