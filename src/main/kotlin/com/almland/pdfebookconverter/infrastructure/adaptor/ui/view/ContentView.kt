@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.progressbar.ProgressBar
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer
+import com.vaadin.flow.dom.Style
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.InputStreamFactory
 import com.vaadin.flow.server.StreamResource
@@ -103,9 +104,9 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
                 val suggestions = aggregateQueryPort.getSuggestions(fileName)
                 val inputStream = aggregateQueryPort.create(fileName, target, memory.inputStream)
                 it.access {
+                    progressBar.removeFromParent()
                     layout.add(createAnchor(inputStream, target, memory))
                     if (suggestions.isNotEmpty()) layout.add(createSuggestion(suggestions))
-                    progressBar.removeFromParent()
                 }
             }
         }
@@ -119,7 +120,10 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         ).apply { scrollDirection = Scroller.ScrollDirection.VERTICAL; scroller = this }
 
     private fun fillWithContent(suggestions: Collection<String>): Component =
-        VerticalLayout(*suggestions.map { Span(it).apply { setWidthFull() } }.toTypedArray())
+        VerticalLayout(*suggestions.map { Span(it).apply { setWidthFull() } }.toTypedArray()).apply {
+            isPadding = false
+            style.setFlexWrap(Style.FlexWrap.WRAP)
+        }
 
     private fun createAnchor(inputStream: InputStream, target: String, memory: MemoryBuffer): Anchor =
         Anchor(createStreamResource(inputStream, target, memory), null).apply {

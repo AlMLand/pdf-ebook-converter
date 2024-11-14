@@ -12,7 +12,7 @@ internal class AIConfiguration {
          * @param {book} is dynamical, it's a placeholder for a book title
          */
         private const val SYSTEM_TEXT = "You are a friendly chatbot can you please recommend books like {book}, " +
-                "your answer is maximum 100 words long"
+                "your answer is maximum 100 words long, please starts without smalltalk"
     }
 
     @Bean

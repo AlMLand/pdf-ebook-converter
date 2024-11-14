@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service
 internal class AIAdaptor(private val chatClient: ChatClient) : AIPort, AIAdaptorFallback() {
 
     companion object {
+        private const val MIN_VALID_LINES_SIZE = 1
+        private val DELIMITERS = arrayOf(". ", "! ", "? ")
         private const val SYSTEM_DYNAMICALLY_PARAM = "book"
     }
 
@@ -26,4 +28,6 @@ internal class AIAdaptor(private val chatClient: ChatClient) : AIPort, AIAdaptor
         text
             .replace("**", "")
             .lines()
+            .takeIf { it.size > MIN_VALID_LINES_SIZE }
+            ?: text.split(delimiters = DELIMITERS)
 }
