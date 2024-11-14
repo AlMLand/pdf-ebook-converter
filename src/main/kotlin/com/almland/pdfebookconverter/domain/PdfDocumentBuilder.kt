@@ -1,10 +1,10 @@
 package com.almland.pdfebookconverter.domain
 
+import java.awt.image.BufferedImage
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.text.PDFTextStripper
-import java.awt.image.BufferedImage
 
 internal object PdfDocumentBuilder {
 
@@ -39,7 +39,9 @@ internal object PdfDocumentBuilder {
      * @return the collection with domain object Page
      */
     fun extractPages(content: ByteArray): Collection<Page> = loadPdfDocument(content).use {
-        val textStripper = PDFTextStripper().apply { sortByPosition = true; addMoreFormatting = true }
+        val textStripper = PDFTextStripper().apply {
+            sortByPosition = true; addMoreFormatting = true; paragraphStart = "\n"
+        }
         List<Page>(size = it.pages.count) { pageIndex ->
             Page(
                 pageIndex,
@@ -55,10 +57,74 @@ internal object PdfDocumentBuilder {
      * @param pageIndex current page index
      * @return text for current document page
      */
-    private fun extractText(pdDocument: PDDocument, textStripper: PDFTextStripper, pageIndex: Int): String {
+    private fun extractText(pdDocument: PDDocument, textStripper: PDFTextStripper, pageIndex: Int): Collection<String> {
         with(textStripper) { startPage = pageIndex + 1; endPage = pageIndex + 1 }
-        return textStripper.getText(pdDocument)
+        return textStripper
+            .getText(pdDocument)
+            .split(textStripper.paragraphStart)
+            .let { groupLines(it) }
     }
+
+    /**
+     * Method group the lines by algorithm: if the first letter of a line is an upper letter,
+     * then other lines witch starts with a lower letter will be concatenated together and so in loop.
+     * @param lines that is a collection with all text lines from one page
+     * @return collection grouped lines
+     */
+    private fun groupLines(lines: Collection<String>): Collection<String> =
+        mutableListOf<String>().apply {
+            var currentParagraph: String? = null
+
+            lines.forEach { line ->
+                if (isNewParagraphStart(line)) {
+                    currentParagraph?.let { add(it) }
+                    currentParagraph = line
+                } else currentParagraph = processLineStartsInLowerCase(currentParagraph, line)
+            }
+
+            currentParagraph?.let { add(it) }
+        }
+
+    /**
+     * Method checks when current line should to be a start for a new paragraph.
+     * @param line current line
+     * @return true when the current line should to be a new paragraph, false when not
+     */
+    private fun isNewParagraphStart(line: String): Boolean = isUpperCase(line) || isDigit(line) || isSymbol(line)
+
+    /**
+     * Often some paragraphs start with symbol like a '-' etc.
+     * This method checks if the first letter is not a letter.
+     * It is unnecessary to check if it is a digit that does the method 'isDigit(…)'
+     * @param line current line
+     * @return true when digit and false when not
+     */
+    private fun isSymbol(line: String): Boolean = line.firstOrNull()?.isLetter()?.not() == true
+
+    /**
+     * Often chapters starts with a digit. This method checks if the first letter is a digit.
+     * @param line current line
+     * @return true when digit and false when not
+     */
+    private fun isDigit(line: String): Boolean = line.firstOrNull()?.isDigit() == true
+
+    /**
+     * Method shows when currentGroup is null, then returns line immediately without transformations,
+     * when currentGroup is not null, then currentGroup will be concatenated with new line
+     * @param currentGroup the current line holder
+     * @param line current line
+     * @return a new value for a currentGroup
+     */
+    private fun processLineStartsInLowerCase(currentGroup: String?, line: String): String =
+        if (currentGroup == null) line
+        else "$currentGroup $line"
+
+    /**
+     * Method checks: is the first letter in the upper case.
+     * @param line one line
+     * @return true when in upper case and false when not
+     */
+    private fun isUpperCase(line: String): Boolean = line.firstOrNull()?.isUpperCase() == true
 
     /**
      * @param pdDocument loaded PDF document

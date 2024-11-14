@@ -15,8 +15,6 @@ import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.TI
 import com.almland.pdfebookconverter.application.port.creator.Creator
 import com.almland.pdfebookconverter.domain.Page
 import com.almland.pdfebookconverter.domain.PdfDocument
-import org.w3c.dom.Document
-import org.w3c.dom.Element
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -31,6 +29,8 @@ import javax.xml.transform.Transformer
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import org.w3c.dom.Document
+import org.w3c.dom.Element
 
 internal class FB2Creator : Creator {
 
@@ -116,10 +116,12 @@ internal class FB2Creator : Creator {
      * @param document this object is a framework that will contain text
      * @param text content from one document page
      */
-    private fun insertText(document: Document, text: String) {
-        document.createElement(PARAGRAPH.tag).apply {
-            textContent = text
-            section.appendChild(this)
+    private fun insertText(document: Document, text: Collection<String>) {
+        text.forEach {
+            document.createElement(PARAGRAPH.tag).apply {
+                textContent = it
+                section.appendChild(this)
+            }
         }
     }
 
