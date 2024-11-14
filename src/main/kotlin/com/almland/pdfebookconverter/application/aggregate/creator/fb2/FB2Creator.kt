@@ -5,10 +5,13 @@ import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.BI
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.BODY
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.BOOK_TITLE
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.DESCRIPTION
+import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.DOCUMENT_INFO
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.FIRST_NAME
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.IMAGE
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.LAST_NAME
+import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.NICKNAME
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.PARAGRAPH
+import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.PROGRAM_USED
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.ROOT
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.SECTION
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.TITLE_INFO
@@ -36,6 +39,7 @@ internal class FB2Creator : Creator {
 
     companion object {
         private const val CONTENT_TYPE = "png"
+        private const val APP_NAME = "T converter"
         private const val XLINK_NAMESPACE_KEY = "xmlns:l"
         private const val XLINK_NAMESPACE_VALUE = "http://www.w3.org/1999/xlink"
     }
@@ -77,6 +81,22 @@ internal class FB2Creator : Creator {
      */
     private fun addDocumentDescription(pdfDocument: PdfDocument, document: Document) {
         document.createElement(DESCRIPTION.tag).also { description ->
+
+            document.createElement(DOCUMENT_INFO.tag).also { documentInfo ->
+                document.createElement(AUTHOR.tag).also { author ->
+                    document.createElement(NICKNAME.tag).apply {
+                        textContent = with(pdfDocument.description.author) { "$firstName $lastName" }
+                        author.appendChild(this)
+                    }
+                    documentInfo.appendChild(author)
+                }
+                document.createElement(PROGRAM_USED.tag).apply {
+                    textContent = APP_NAME
+                    documentInfo.appendChild(this)
+                }
+                description.appendChild(documentInfo)
+            }
+
             document.createElement(TITLE_INFO.tag).also { titleInfo ->
                 document.createElement(BOOK_TITLE.tag).apply {
                     textContent = pdfDocument.description.title
@@ -95,6 +115,7 @@ internal class FB2Creator : Creator {
                 }
                 description.appendChild(titleInfo)
             }
+
             root.appendChild(description)
         }
     }

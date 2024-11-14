@@ -8,9 +8,12 @@ internal enum class FB2Tag(val tag: String) {
     BINARY("binary"),
     SECTION("section"),
     ROOT("FictionBook"),
+    NICKNAME("nickname"),
     LAST_NAME("last-name"),
     FIRST_NAME("first-name"),
     BOOK_TITLE("book-title"),
     TITLE_INFO("title-info"),
-    DESCRIPTION("description")
+    DESCRIPTION("description"),
+    PROGRAM_USED("program-used"),
+    DOCUMENT_INFO("document-info")
 }
