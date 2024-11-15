@@ -73,6 +73,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
                         addFileRemovedListener {
                             if (isAnchorInitialized()) anchor.removeFromParent()
                             if (isScrollerInitialized()) scroller.removeFromParent()
+                            if (isProgressBarInitialized()) progressBar.removeFromParent()
                         }
                     }
                 }
@@ -86,6 +87,8 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
     private fun isAnchorInitialized(): Boolean = this::anchor.isInitialized
 
     private fun isScrollerInitialized(): Boolean = this::scroller.isInitialized
+
+    private fun isProgressBarInitialized(): Boolean = this::progressBar.isInitialized
 
     private fun createDownloadProgressBar() {
         ProgressBar().apply {
