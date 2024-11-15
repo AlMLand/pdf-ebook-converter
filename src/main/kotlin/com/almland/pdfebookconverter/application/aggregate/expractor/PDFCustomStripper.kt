@@ -44,7 +44,7 @@ internal class PDFCustomStripper : PDFTextStripper() {
         if (currentPage != null) {
             pages.add(currentPage!!)
             currentPage = null
-        } else pages.add(Page(pageIndex.get(), mutableListOf(), emptyMap()))
+        } else pages.add(Page(pageIndex.get(), mutableListOf(), emptyList()))
     }
 
     /**
@@ -69,7 +69,7 @@ internal class PDFCustomStripper : PDFTextStripper() {
                 currentPage = Page(
                     pageIndex.get(),
                     mutableListOf(Line(text, isBold(textPositions))),
-                    emptyMap()
+                    emptyList()
                 )
             } else currentPage?.lines?.add(Line(text, isBold(textPositions)))
 

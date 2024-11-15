@@ -155,20 +155,20 @@ internal class FB2Creator : Creator {
      * @param document this object is a framework that will contain images
      */
     private fun insertImage(document: Document, page: Page) {
-        page.images.forEach { indexOnPage, image ->
+        page.images.forEach { image ->
             document.createElement(BINARY.tag).apply {
                 document.createElement(PARAGRAPH.tag).apply {
                     appendChild(
                         document.createElement(IMAGE.tag).apply {
-                            setAttribute("l:href", "#image_${page.index}-$indexOnPage")
+                            setAttribute("l:href", "#image_${page.index}-${image.order}")
                         }
                     )
                     section.appendChild(this)
                 }
                 document.createElement(BINARY.tag).apply {
-                    setAttribute("id", "image_${page.index}-$indexOnPage")
+                    setAttribute("id", "image_${page.index}-${image.order}")
                     setAttribute("content-type", "image/$CONTENT_TYPE")
-                    appendChild(document.createTextNode(convertImageToBase64(image)))
+                    appendChild(document.createTextNode(convertImageToBase64(image.bufferedImage)))
                     root.appendChild(this)
                 }
             }

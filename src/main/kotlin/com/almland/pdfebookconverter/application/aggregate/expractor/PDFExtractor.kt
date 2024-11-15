@@ -3,8 +3,8 @@ package com.almland.pdfebookconverter.application.aggregate.expractor
 import com.almland.pdfebookconverter.domain.Author
 import com.almland.pdfebookconverter.domain.Chapter
 import com.almland.pdfebookconverter.domain.Description
+import com.almland.pdfebookconverter.domain.Image
 import com.almland.pdfebookconverter.domain.Page
-import java.awt.image.BufferedImage
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
@@ -79,12 +79,12 @@ internal object PDFExtractor {
      * @param pageIndex current page index
      * @return map (key:image index on current page) to the (value:buffered image)
      */
-    private fun extractImages(pdDocument: PDDocument, pageIndex: Int): Map<Int, BufferedImage> =
-        mutableMapOf<Int, BufferedImage>().apply {
+    private fun extractImages(pdDocument: PDDocument, pageIndex: Int): Collection<Image> =
+        mutableListOf<Image>().apply {
             with(pdDocument.pages[pageIndex].resources) {
                 xObjectNames.forEachIndexed { nameIndex, name ->
                     val pdxObject = getXObject(name)
-                    if (pdxObject is PDImageXObject) put(nameIndex, pdxObject.image)
+                    if (pdxObject is PDImageXObject) add(Image(nameIndex, pdxObject.image))
                 }
             }
         }
