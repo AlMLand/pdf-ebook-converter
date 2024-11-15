@@ -14,8 +14,10 @@ import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.PA
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.PROGRAM_USED
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.ROOT
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.SECTION
+import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.STRONG
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.TITLE_INFO
 import com.almland.pdfebookconverter.application.port.creator.Creator
+import com.almland.pdfebookconverter.domain.Line
 import com.almland.pdfebookconverter.domain.Page
 import com.almland.pdfebookconverter.domain.PdfDocument
 import java.awt.image.BufferedImage
@@ -127,27 +129,28 @@ internal class FB2Creator : Creator {
      */
     private fun fillDocument(pdfDocument: PdfDocument, document: Document) {
         pdfDocument.pages.forEachIndexed { pageIndex, page ->
-            insertText(document, page.text)
-            insertImage(document, page)
+            page.lines.forEach { insertText(document, it) }
+            page.images.forEach { insertImage(document, page) }
         }
     }
 
-    /**
-     * Insert text into document.
-     * @param document this object is a framework that will contain text
-     * @param text content from one document page
-     */
-    private fun insertText(document: Document, text: Collection<String>) {
-        text.forEach {
-            document.createElement(PARAGRAPH.tag).apply {
-                textContent = it
-                section.appendChild(this)
+    private fun insertText(document: Document, line: Line) {
+        if (line.isBold) {
+            document.createElement(PARAGRAPH.tag).also { paragraph ->
+                document.createElement(STRONG.tag).apply {
+                    textContent = line.text
+                    paragraph.appendChild(this)
+                }
+                section.appendChild(paragraph)
             }
+        } else document.createElement(PARAGRAPH.tag).apply {
+            textContent = line.text
+            section.appendChild(this)
         }
     }
 
     /**
-     * Insert images into document. It's possible one or more images per page.
+     * Insert images into a document. It's possible for one or more images per page.
      * @param page domain object which contains pageIndex and images
      * @param document this object is a framework that will contain images
      */
@@ -157,13 +160,13 @@ internal class FB2Creator : Creator {
                 document.createElement(PARAGRAPH.tag).apply {
                     appendChild(
                         document.createElement(IMAGE.tag).apply {
-                            setAttribute("l:href", "#image_${page.pageIndex}-$indexOnPage")
+                            setAttribute("l:href", "#image_${page.index}-$indexOnPage")
                         }
                     )
                     section.appendChild(this)
                 }
                 document.createElement(BINARY.tag).apply {
-                    setAttribute("id", "image_${page.pageIndex}-$indexOnPage")
+                    setAttribute("id", "image_${page.index}-$indexOnPage")
                     setAttribute("content-type", "image/$CONTENT_TYPE")
                     appendChild(document.createTextNode(convertImageToBase64(image)))
                     root.appendChild(this)

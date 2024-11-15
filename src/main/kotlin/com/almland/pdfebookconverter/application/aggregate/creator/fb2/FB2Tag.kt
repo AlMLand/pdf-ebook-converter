@@ -4,6 +4,7 @@ internal enum class FB2Tag(val tag: String) {
     BODY("body"),
     IMAGE("image"),
     PARAGRAPH("p"),
+    STRONG("strong"),
     AUTHOR("author"),
     BINARY("binary"),
     SECTION("section"),
