@@ -16,9 +16,6 @@ internal class PDFCustomStripper : PDFTextStripper() {
 
     companion object {
         private const val TEXT_POSITION_FIRST = 0
-        private const val FONT_PATTERN_BOLD = "bold"
-        private const val FONT_PATTERN_DEMI = "demi"
-        private const val FONT_PATTERN_BLACK = "black"
     }
 
     private var currentPage: Page? = null
@@ -65,16 +62,20 @@ internal class PDFCustomStripper : PDFTextStripper() {
      */
     override fun writeString(text: String?, textPositions: List<TextPosition?>?) {
         if (isTextNotNullNotEmpty(text) && textPositions != null && textPositions.isNotEmpty())
-            if (currentPage == null) {
-                currentPage = Page(
-                    pageIndex.get(),
-                    mutableListOf(Line(text, isBold(textPositions))),
-                    emptyList()
-                )
-            } else currentPage?.lines?.add(Line(text, isBold(textPositions)))
+            Line(text, getFontName(textPositions)).let { line ->
+                if (currentPage == null) {
+                    currentPage = Page(
+                        pageIndex.get(),
+                        mutableListOf(line),
+                        emptyList()
+                    )
+                } else currentPage?.lines?.add(line)
+            }
 
         super.writeString(text, textPositions)
     }
+
+    private fun getFontName(textPositions: List<TextPosition?>): String = textPositions[TEXT_POSITION_FIRST]!!.font.name
 
     /**
      * Check when the ongoing text is not null and not empty.
@@ -82,25 +83,6 @@ internal class PDFCustomStripper : PDFTextStripper() {
      * @return boolean result
      */
     private fun isTextNotNullNotEmpty(text: String?): Boolean = text?.isNotBlank() == true
-
-    /**
-     * Extract the first TextPosition from a collection, get font, and compare.
-     * @param textPositions collection of TextPositions
-     */
-    private fun isBold(textPositions: List<TextPosition?>): Boolean =
-        textPositions[TEXT_POSITION_FIRST]
-            ?.font
-            ?.name
-            ?.lowercase()
-            ?.let { containsBoldPattern(it) } == true
-
-    /**
-     * Checks whe the actual fontName contains the key words.
-     * @param fontName current fontName
-     * @return boolean result
-     */
-    private fun containsBoldPattern(fontName: String): Boolean =
-        with(fontName) { contains(FONT_PATTERN_BOLD) || contains(FONT_PATTERN_DEMI) || contains(FONT_PATTERN_BLACK) }
 
     /**
      * Method group the lines by algorithm: if the first letter of a line is an upper letter,

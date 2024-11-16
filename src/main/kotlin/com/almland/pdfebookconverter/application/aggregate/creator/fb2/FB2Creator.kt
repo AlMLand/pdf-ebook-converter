@@ -17,8 +17,8 @@ import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.SE
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.STRONG
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.TITLE_INFO
 import com.almland.pdfebookconverter.application.port.creator.Creator
+import com.almland.pdfebookconverter.domain.Image
 import com.almland.pdfebookconverter.domain.Line
-import com.almland.pdfebookconverter.domain.Page
 import com.almland.pdfebookconverter.domain.PdfDocument
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -123,19 +123,21 @@ internal class FB2Creator : Creator {
     }
 
     /**
-     * Inserts text and images into a document.
+     * Inserts all text lines first time after this all images into a document.
      * @param pdfDocument domain object
      * @param document this object is a framework witch will contain text and images
      */
     private fun fillDocument(pdfDocument: PdfDocument, document: Document) {
-        pdfDocument.pages.forEachIndexed { pageIndex, page ->
-            page.lines.forEach { insertText(document, it) }
-            page.images.forEach { insertImage(document, page) }
+        pdfDocument.pages.forEach { page ->
+            with(page) {
+                images.forEach { insertImage(document, it) }
+                lines.forEach { insertText(document, it) }
+            }
         }
     }
 
     private fun insertText(document: Document, line: Line) {
-        if (line.isBold) {
+        if (line.isBold == true) {
             document.createElement(PARAGRAPH.tag).also { paragraph ->
                 document.createElement(STRONG.tag).apply {
                     textContent = line.text
@@ -154,23 +156,21 @@ internal class FB2Creator : Creator {
      * @param page domain object which contains pageIndex and images
      * @param document this object is a framework that will contain images
      */
-    private fun insertImage(document: Document, page: Page) {
-        page.images.forEach { image ->
+    private fun insertImage(document: Document, image: Image) {
+        document.createElement(BINARY.tag).apply {
+            document.createElement(PARAGRAPH.tag).apply {
+                appendChild(
+                    document.createElement(IMAGE.tag).apply {
+                        setAttribute("l:href", "#image_${image.hashCode()}-${image.order}")
+                    }
+                )
+                section.appendChild(this)
+            }
             document.createElement(BINARY.tag).apply {
-                document.createElement(PARAGRAPH.tag).apply {
-                    appendChild(
-                        document.createElement(IMAGE.tag).apply {
-                            setAttribute("l:href", "#image_${page.index}-${image.order}")
-                        }
-                    )
-                    section.appendChild(this)
-                }
-                document.createElement(BINARY.tag).apply {
-                    setAttribute("id", "image_${page.index}-${image.order}")
-                    setAttribute("content-type", "image/$CONTENT_TYPE")
-                    appendChild(document.createTextNode(convertImageToBase64(image.bufferedImage)))
-                    root.appendChild(this)
-                }
+                setAttribute("id", "image_${image.hashCode()}-${image.order}")
+                setAttribute("content-type", "image/$CONTENT_TYPE")
+                appendChild(document.createTextNode(convertImageToBase64(image.bufferedImage)))
+                root.appendChild(this)
             }
         }
     }
