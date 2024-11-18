@@ -5,6 +5,7 @@ import com.almland.pdfebookconverter.domain.FileTarget
 import java.io.InputStream
 
 internal class PdfDocumentRule {
+
     fun create(
         fB2Creator: Creator,
         ePUBCreator: Creator,

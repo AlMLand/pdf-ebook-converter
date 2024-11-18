@@ -16,7 +16,7 @@ internal class AIAdaptor(private val chatClient: ChatClient) : AIPort, AIAdaptor
     }
 
     @CircuitBreaker(name = "aiPort", fallbackMethod = "callFallback")
-    override fun call(text: String): Collection<String> =
+    override suspend fun call(text: String): Collection<String> =
         chatClient
             .prompt()
             .system { it.param(SYSTEM_DYNAMICALLY_PARAM, text) }

@@ -1,8 +1,9 @@
 package com.almland.pdfebookconverter.application.port.aggregator
 
+import com.almland.pdfebookconverter.application.port.coroutines.CustomScope
 import java.io.InputStream
 
 internal interface AggregateQueryPort {
-    fun getSuggestions(fileName: String): Collection<String>
-    fun create(fileName: String, target: String, content: InputStream): InputStream
+    suspend fun getSuggestions(fileName: String): Collection<String>
+    suspend fun create(fileName: String, target: String, content: InputStream, coroutineScope: CustomScope): InputStream
 }

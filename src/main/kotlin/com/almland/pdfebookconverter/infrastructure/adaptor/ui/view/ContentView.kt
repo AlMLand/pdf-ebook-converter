@@ -1,9 +1,11 @@
 package com.almland.pdfebookconverter.infrastructure.adaptor.ui.view
 
 import com.almland.pdfebookconverter.application.port.aggregator.AggregateQueryPort
+import com.almland.pdfebookconverter.application.port.coroutines.CustomScope
 import com.almland.pdfebookconverter.infrastructure.adaptor.ui.MainLayout
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Composite
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.combobox.ComboBoxVariant
@@ -22,17 +24,22 @@ import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.InputStreamFactory
 import com.vaadin.flow.server.StreamResource
 import java.io.InputStream
-import kotlin.concurrent.thread
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
+@OptIn(DelicateCoroutinesApi::class)
 @Route(value = ContentView.PATH, layout = MainLayout::class)
 internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) : Composite<Component>() {
 
     companion object {
         const val PATH = ""
-        private const val CONTENT_CREATION_THREAD = "createContent"
         private val ACCEPTED_FILE_TYPES = arrayOf("application/pdf")
     }
 
+    private lateinit var coroutineScope: CustomScope
     private lateinit var upload: Upload
     private lateinit var anchor: Anchor
     private lateinit var scroller: Scroller
@@ -68,9 +75,10 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
                         setAcceptedFileTypes(*ACCEPTED_FILE_TYPES)
                         addSucceededListener {
                             createDownloadProgressBar()
-                            createDownloadLink(memory)
+                            ui.ifPresent { createDownloadLink(memory, it) }
                         }
                         addFileRemovedListener {
+                            coroutineScope.onStop()
                             if (isAnchorInitialized()) anchor.removeFromParent()
                             if (isScrollerInitialized()) scroller.removeFromParent()
                             if (isProgressBarInitialized()) progressBar.removeFromParent()
@@ -99,21 +107,32 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         }
     }
 
-    private fun createDownloadLink(memory: MemoryBuffer) {
-        ui.ifPresent {
-            thread(name = CONTENT_CREATION_THREAD) {
-                val target = comboBox.value.target
-                val fileName = getFileName(target, memory)
-                val suggestions = aggregateQueryPort.getSuggestions(fileName)
-                val inputStream = aggregateQueryPort.create(fileName, target, memory.inputStream)
-                it.access {
-                    progressBar.removeFromParent()
-                    layout.add(createAnchor(inputStream, target, memory))
-                    if (suggestions.isNotEmpty()) layout.add(createSuggestion(suggestions))
-                }
+    private fun createDownloadLink(memory: MemoryBuffer, uI: UI) {
+        coroutineScope = CustomScope()
+        coroutineScope.launch {
+            val target = comboBox.value.target
+            val fileName = getFileName(target, memory)
+            val suggestions = getSuggestionsAsync(fileName).await()
+            val inputStream = getDownloadContentAsync(fileName, target, memory).await()
+            uI.access {
+                progressBar.removeFromParent()
+                layout.add(createAnchor(inputStream, target, memory))
+                if (suggestions.isNotEmpty()) layout.add(createSuggestion(suggestions))
             }
         }
     }
+
+    private fun getDownloadContentAsync(fileName: String, target: String, memory: MemoryBuffer): Deferred<InputStream> =
+        coroutineScope.async {
+            if (isActive.not()) return@async InputStream.nullInputStream()
+            else aggregateQueryPort.create(fileName, target, memory.inputStream, coroutineScope)
+        }
+
+    private fun getSuggestionsAsync(fileName: String): Deferred<Collection<String>> =
+        coroutineScope.async {
+            if (isActive.not()) return@async listOf()
+            else aggregateQueryPort.getSuggestions(fileName)
+        }
 
     private fun createSuggestion(suggestions: Collection<String>): Component =
         Scroller(

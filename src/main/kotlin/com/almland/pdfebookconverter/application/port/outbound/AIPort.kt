@@ -1,5 +1,5 @@
 package com.almland.pdfebookconverter.application.port.outbound
 
 internal interface AIPort {
-    fun call(text: String): Collection<String>
+    suspend fun call(text: String): Collection<String>
 }
