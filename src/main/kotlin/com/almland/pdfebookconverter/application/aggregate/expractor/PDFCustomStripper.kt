@@ -1,7 +1,7 @@
 package com.almland.pdfebookconverter.application.aggregate.expractor
 
-import com.almland.pdfebookconverter.domain.Line
-import com.almland.pdfebookconverter.domain.Page
+import com.almland.pdfebookconverter.domain.pdffilestructure.Line
+import com.almland.pdfebookconverter.domain.pdffilestructure.Page
 import java.util.concurrent.atomic.AtomicInteger
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage

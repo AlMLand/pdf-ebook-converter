@@ -1,7 +1,9 @@
 package com.almland.pdfebookconverter.domain
 
-import com.almland.pdfebookconverter.domain.PdfDocumentBuilder.extractDescription
-import com.almland.pdfebookconverter.domain.PdfDocumentBuilder.extractPages
+import com.almland.pdfebookconverter.application.aggregate.expractor.PDFExtractor.extractDescription
+import com.almland.pdfebookconverter.application.aggregate.expractor.PDFExtractor.extractPages
+import com.almland.pdfebookconverter.domain.pdffilestructure.Page
+import com.almland.pdfebookconverter.domain.pdfmetainfo.Description
 import java.io.InputStream
 
 internal data class PdfDocument(private val content: InputStream) {

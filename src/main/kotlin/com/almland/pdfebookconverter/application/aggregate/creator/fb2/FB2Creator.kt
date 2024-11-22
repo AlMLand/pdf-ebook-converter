@@ -17,9 +17,9 @@ import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.SE
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.STRONG
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.TITLE_INFO
 import com.almland.pdfebookconverter.application.port.creator.Creator
-import com.almland.pdfebookconverter.domain.Image
-import com.almland.pdfebookconverter.domain.Line
 import com.almland.pdfebookconverter.domain.PdfDocument
+import com.almland.pdfebookconverter.domain.pdffilestructure.Image
+import com.almland.pdfebookconverter.domain.pdffilestructure.Line
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -153,8 +153,8 @@ internal class FB2Creator : Creator {
 
     /**
      * Insert images into a document. It's possible for one or more images per page.
-     * @param page domain object which contains pageIndex and images
      * @param document this object is a framework that will contain images
+     * @param image domain object image
      */
     private fun insertImage(document: Document, image: Image) {
         document.createElement(BINARY.tag).apply {

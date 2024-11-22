@@ -1,10 +1,9 @@
 package com.almland.pdfebookconverter.application.aggregate.expractor
 
-import com.almland.pdfebookconverter.domain.Author
-import com.almland.pdfebookconverter.domain.Chapter
-import com.almland.pdfebookconverter.domain.Description
-import com.almland.pdfebookconverter.domain.Image
-import com.almland.pdfebookconverter.domain.Page
+import com.almland.pdfebookconverter.domain.pdffilestructure.Image
+import com.almland.pdfebookconverter.domain.pdffilestructure.Page
+import com.almland.pdfebookconverter.domain.pdfmetainfo.Author
+import com.almland.pdfebookconverter.domain.pdfmetainfo.Description
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
@@ -35,30 +34,6 @@ internal object PDFExtractor {
                 )
             )
         }
-    }
-
-    fun groupChapters(pages: Collection<Page>): Collection<Chapter> {
-        mutableListOf<Chapter>().apply {
-            var currentChapter: Chapter? = null
-
-            pages.forEach { page ->
-                if (isNewChapterStart(page)) {
-                    currentChapter?.let { add(it) }
-//                    currentChapter = page
-                } else addPageToCurrentChapter(currentChapter, page)
-            }
-
-            currentChapter?.let { add(it) }
-        }
-        TODO()
-    }
-
-    private fun addPageToCurrentChapter(currentChapter: Chapter?, page: Page) {
-        TODO()
-    }
-
-    private fun isNewChapterStart(page: Page): Boolean {
-        TODO()
     }
 
     /**
