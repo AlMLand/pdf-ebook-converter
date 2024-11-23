@@ -1,7 +1,7 @@
 package com.almland.pdfebookconverter.infrastructure.adaptor.ui.view
 
+import com.almland.pdfebookconverter.application.aggregate.coroutines.CustomScope
 import com.almland.pdfebookconverter.application.port.aggregator.AggregateQueryPort
-import com.almland.pdfebookconverter.application.port.coroutines.CustomScope
 import com.almland.pdfebookconverter.infrastructure.adaptor.ui.MainLayout
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Composite

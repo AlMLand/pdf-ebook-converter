@@ -1,8 +1,8 @@
 package com.almland.pdfebookconverter.application.aggregate
 
+import com.almland.pdfebookconverter.application.aggregate.coroutines.CustomScope
 import com.almland.pdfebookconverter.application.aggregate.creator.rule.PdfDocumentRule
 import com.almland.pdfebookconverter.application.port.aggregator.AggregateQueryPort
-import com.almland.pdfebookconverter.application.port.coroutines.CustomScope
 import com.almland.pdfebookconverter.application.port.creator.Creator
 import com.almland.pdfebookconverter.application.port.outbound.AIPort
 import java.io.InputStream

@@ -1,4 +1,4 @@
-package com.almland.pdfebookconverter.application.port.coroutines
+package com.almland.pdfebookconverter.application.aggregate.coroutines
 
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
