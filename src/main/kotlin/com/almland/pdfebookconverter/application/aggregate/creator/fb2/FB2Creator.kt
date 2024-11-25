@@ -34,10 +34,13 @@ import javax.xml.transform.Transformer
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 
-internal class FB2Creator : Creator {
+internal open class FB2Creator : Creator {
 
     companion object {
         private const val CONTENT_TYPE = "png"
@@ -55,70 +58,78 @@ internal class FB2Creator : Creator {
      * @return create an inputStream from document, a document will be created from PdfDocument
      * document can contain text and images
      */
-    override fun create(pdfDocument: PdfDocument): InputStream =
-        getNewDocument().let { document ->
-            document.createElement(ROOT.tag).apply {
-                setAttribute(XLINK_NAMESPACE_KEY, XLINK_NAMESPACE_VALUE)
-                document.appendChild(this)
-                root = this
-            }
-            addDocumentDescription(pdfDocument, document)
-            document.createElement(BODY.tag).apply {
-                root.appendChild(this)
-                body = this
-            }
-            document.createElement(SECTION.tag).apply {
-                body.appendChild(this)
-                section = this
-            }
+    override suspend fun create(pdfDocument: PdfDocument, context: CoroutineContext): InputStream =
+        withContext(context + Dispatchers.Default) {
+            getNewDocument().let { document ->
+                document.createElement(ROOT.tag).apply {
+                    setAttribute(XLINK_NAMESPACE_KEY, XLINK_NAMESPACE_VALUE)
+                    document.appendChild(this)
+                    root = this
+                }
+                addDocumentDescription(pdfDocument, document, coroutineContext)
+                document.createElement(BODY.tag).apply {
+                    root.appendChild(this)
+                    body = this
+                }
+                document.createElement(SECTION.tag).apply {
+                    body.appendChild(this)
+                    section = this
+                }
 
-            fillDocument(pdfDocument, document)
+                fillDocument(pdfDocument, document, coroutineContext)
 
-            documentToInputStream(document)
+                documentToInputStream(document)
+            }
         }
 
     /**
      * Add the document description like title, author first and last name
      * @param document this object is a framework witch will in this case contain common information over a book
      */
-    private fun addDocumentDescription(pdfDocument: PdfDocument, document: Document) {
-        document.createElement(DESCRIPTION.tag).also { description ->
+    private suspend fun addDocumentDescription(
+        pdfDocument: PdfDocument,
+        document: Document,
+        context: CoroutineContext
+    ) {
+        withContext(context) {
+            document.createElement(DESCRIPTION.tag).also { description ->
 
-            document.createElement(DOCUMENT_INFO.tag).also { documentInfo ->
-                document.createElement(AUTHOR.tag).also { author ->
-                    document.createElement(NICKNAME.tag).apply {
-                        textContent = with(pdfDocument.description.author) { "$firstName $lastName" }
-                        author.appendChild(this)
+                document.createElement(DOCUMENT_INFO.tag).also { documentInfo ->
+                    document.createElement(AUTHOR.tag).also { author ->
+                        document.createElement(NICKNAME.tag).apply {
+                            textContent = with(pdfDocument.description.author) { "$firstName $lastName" }
+                            author.appendChild(this)
+                        }
+                        documentInfo.appendChild(author)
                     }
-                    documentInfo.appendChild(author)
+                    document.createElement(PROGRAM_USED.tag).apply {
+                        textContent = APP_NAME
+                        documentInfo.appendChild(this)
+                    }
+                    description.appendChild(documentInfo)
                 }
-                document.createElement(PROGRAM_USED.tag).apply {
-                    textContent = APP_NAME
-                    documentInfo.appendChild(this)
+
+                document.createElement(TITLE_INFO.tag).also { titleInfo ->
+                    document.createElement(BOOK_TITLE.tag).apply {
+                        textContent = pdfDocument.description.title
+                        titleInfo.appendChild(this)
+                    }
+                    document.createElement(AUTHOR.tag).also { author ->
+                        document.createElement(FIRST_NAME.tag).apply {
+                            textContent = pdfDocument.description.author.firstName
+                            author.appendChild(this)
+                        }
+                        document.createElement(LAST_NAME.tag).apply {
+                            textContent = pdfDocument.description.author.lastName
+                            author.appendChild(this)
+                        }
+                        titleInfo.appendChild(author)
+                    }
+                    description.appendChild(titleInfo)
                 }
-                description.appendChild(documentInfo)
+
+                root.appendChild(description)
             }
-
-            document.createElement(TITLE_INFO.tag).also { titleInfo ->
-                document.createElement(BOOK_TITLE.tag).apply {
-                    textContent = pdfDocument.description.title
-                    titleInfo.appendChild(this)
-                }
-                document.createElement(AUTHOR.tag).also { author ->
-                    document.createElement(FIRST_NAME.tag).apply {
-                        textContent = pdfDocument.description.author.firstName
-                        author.appendChild(this)
-                    }
-                    document.createElement(LAST_NAME.tag).apply {
-                        textContent = pdfDocument.description.author.lastName
-                        author.appendChild(this)
-                    }
-                    titleInfo.appendChild(author)
-                }
-                description.appendChild(titleInfo)
-            }
-
-            root.appendChild(description)
         }
     }
 
@@ -127,27 +138,31 @@ internal class FB2Creator : Creator {
      * @param pdfDocument domain object
      * @param document this object is a framework witch will contain text and images
      */
-    private fun fillDocument(pdfDocument: PdfDocument, document: Document) {
-        pdfDocument.pages.forEach { page ->
-            with(page) {
-                images.forEach { insertImage(document, it) }
-                lines.forEach { insertText(document, it) }
+    private suspend fun fillDocument(pdfDocument: PdfDocument, document: Document, context: CoroutineContext) {
+        withContext(context) {
+            pdfDocument.pages.forEach { page ->
+                with(page) {
+                    images.forEach { insertImage(document, it, context) }
+                    lines.forEach { insertText(document, it, context) }
+                }
             }
         }
     }
 
-    private fun insertText(document: Document, line: Line) {
-        if (line.isBold == true) {
-            document.createElement(PARAGRAPH.tag).also { paragraph ->
-                document.createElement(STRONG.tag).apply {
-                    textContent = line.text
-                    paragraph.appendChild(this)
+    private suspend fun insertText(document: Document, line: Line, context: CoroutineContext) {
+        withContext(context) {
+            if (line.isBold == true) {
+                document.createElement(PARAGRAPH.tag).also { paragraph ->
+                    document.createElement(STRONG.tag).apply {
+                        textContent = line.text
+                        paragraph.appendChild(this)
+                    }
+                    section.appendChild(paragraph)
                 }
-                section.appendChild(paragraph)
+            } else document.createElement(PARAGRAPH.tag).apply {
+                textContent = line.text
+                section.appendChild(this)
             }
-        } else document.createElement(PARAGRAPH.tag).apply {
-            textContent = line.text
-            section.appendChild(this)
         }
     }
 
@@ -156,21 +171,23 @@ internal class FB2Creator : Creator {
      * @param document this object is a framework that will contain images
      * @param image domain object image
      */
-    private fun insertImage(document: Document, image: Image) {
-        document.createElement(BINARY.tag).apply {
-            document.createElement(PARAGRAPH.tag).apply {
-                appendChild(
-                    document.createElement(IMAGE.tag).apply {
-                        setAttribute("l:href", "#image_${image.hashCode()}-${image.order}")
-                    }
-                )
-                section.appendChild(this)
-            }
+    private suspend fun insertImage(document: Document, image: Image, context: CoroutineContext) {
+        withContext(context) {
             document.createElement(BINARY.tag).apply {
-                setAttribute("id", "image_${image.hashCode()}-${image.order}")
-                setAttribute("content-type", "image/$CONTENT_TYPE")
-                appendChild(document.createTextNode(convertImageToBase64(image.bufferedImage)))
-                root.appendChild(this)
+                document.createElement(PARAGRAPH.tag).apply {
+                    appendChild(
+                        document.createElement(IMAGE.tag).apply {
+                            setAttribute("l:href", "#image_${image.hashCode()}-${image.order}")
+                        }
+                    )
+                    section.appendChild(this)
+                }
+                document.createElement(BINARY.tag).apply {
+                    setAttribute("id", "image_${image.hashCode()}-${image.order}")
+                    setAttribute("content-type", "image/$CONTENT_TYPE")
+                    appendChild(document.createTextNode(convertImageToBase64(image.bufferedImage)))
+                    root.appendChild(this)
+                }
             }
         }
     }
