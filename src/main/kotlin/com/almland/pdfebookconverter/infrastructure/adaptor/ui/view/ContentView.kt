@@ -13,6 +13,9 @@ import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.VaadinIcon.DOWNLOAD
+import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.notification.Notification.Position.BOTTOM_CENTER
+import com.vaadin.flow.component.notification.NotificationVariant
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.Scroller
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -24,8 +27,10 @@ import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.InputStreamFactory
 import com.vaadin.flow.server.StreamResource
 import java.io.InputStream
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -36,6 +41,8 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
 
     companion object {
         const val PATH = ""
+        private const val ERROR_NOTIFICATION_DURATION = 5000
+        private const val ERROR_NOTIFICATION_MESSAGE = "Internal error"
         private val ACCEPTED_FILE_TYPES = arrayOf("application/pdf")
     }
 
@@ -108,12 +115,20 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
     }
 
     private fun createDownloadLink(memory: MemoryBuffer, uI: UI) {
-        coroutineScope = CustomScope()
-        coroutineScope.launch {
+        coroutineScope = CustomScope {
+            uI.access {
+                upload.clearFileList()
+                progressBar.removeFromParent()
+                Notification
+                    .show(ERROR_NOTIFICATION_MESSAGE, ERROR_NOTIFICATION_DURATION, BOTTOM_CENTER)
+                    .apply { addThemeVariants(NotificationVariant.LUMO_ERROR) }
+            }
+        }
+        coroutineScope.launch(Dispatchers.Default) {
             val target = comboBox.value.target
             val fileName = getFileName(target, memory)
-            val suggestions = getSuggestionsAsync(fileName).await()
-            val inputStream = getDownloadContentAsync(fileName, target, memory).await()
+            val suggestions = getSuggestionsAsync(fileName, coroutineContext).await()
+            val inputStream = getDownloadContentAsync(fileName, target, memory, coroutineContext).await()
             uI.access {
                 progressBar.removeFromParent()
                 layout.add(createAnchor(inputStream, target, memory))
@@ -122,16 +137,18 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         }
     }
 
-    private fun getDownloadContentAsync(fileName: String, target: String, memory: MemoryBuffer): Deferred<InputStream> =
+    private fun getDownloadContentAsync(
+        fileName: String, target: String, memory: MemoryBuffer, context: CoroutineContext
+    ): Deferred<InputStream> =
         coroutineScope.async {
             if (isActive.not()) return@async InputStream.nullInputStream()
-            else aggregateQueryPort.create(fileName, target, memory.inputStream, coroutineScope)
+            else aggregateQueryPort.create(target, fileName, memory.inputStream, context)
         }
 
-    private fun getSuggestionsAsync(fileName: String): Deferred<Collection<String>> =
+    private fun getSuggestionsAsync(fileName: String, context: CoroutineContext): Deferred<Collection<String>> =
         coroutineScope.async {
             if (isActive.not()) return@async listOf()
-            else aggregateQueryPort.getSuggestions(fileName)
+            else aggregateQueryPort.getSuggestions(fileName, context)
         }
 
     private fun createSuggestion(suggestions: Collection<String>): Component =

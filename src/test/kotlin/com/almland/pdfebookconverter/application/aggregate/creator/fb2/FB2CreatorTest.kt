@@ -14,6 +14,9 @@ internal class FB2CreatorTest {
 
     @Test
     fun `createFB2 `() {
-        FB2Creator().create(PdfDocument(FileTarget.FB2, ClassPathResource(PDF_TEXT_IMAGE_TEST_PDF).inputStream))
+        FB2Creator().create(
+            PdfDocument(FileTarget.FB2, ClassPathResource(PDF_TEXT_IMAGE_TEST_PDF).inputStream),
+            coroutineScope
+        )
     }
 }
