@@ -1,5 +1,8 @@
 package com.almland.pdfebookconverter.domain
 
+import com.almland.pdfebookconverter.application.aggregate.expractor.PdfDocumentExtractor
+import java.awt.image.BufferedImage
+import java.util.stream.Stream
 import org.apache.pdfbox.Loader
 import org.apache.pdfbox.text.PDFTextStripper
 import org.assertj.core.api.Assertions.assertThat
@@ -10,8 +13,6 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.core.io.ClassPathResource
 import org.springframework.test.util.ReflectionTestUtils
-import java.awt.image.BufferedImage
-import java.util.stream.Stream
 
 internal class PdfDocumentBuilderTest {
 
@@ -44,7 +45,7 @@ internal class PdfDocumentBuilderTest {
 
         val content = ClassPathResource(PDF_TEXT_TEST_PDF).contentAsByteArray
 
-        val actual = PdfDocumentBuilder.extractDescription(content)
+        val actual = PdfDocumentExtractor.extractDescription(content)
 
         with(actual) {
             assertThat(author.firstName).isEqualTo(expectedFirstname)
@@ -62,7 +63,7 @@ internal class PdfDocumentBuilderTest {
     fun `extractPages, scenario describe above`(file: String, expectedSize: Int) {
         val content = ClassPathResource(file).contentAsByteArray
 
-        val actual = PdfDocumentBuilder.extractPages(content)
+        val actual = PdfDocumentExtractor.extractPages(content)
 
         assertThat(actual.size).isEqualTo(expectedSize)
     }
@@ -79,7 +80,7 @@ internal class PdfDocumentBuilderTest {
         val textStripper = PDFTextStripper().apply { sortByPosition = true; addMoreFormatting = true }
 
         val actual = ReflectionTestUtils.invokeMethod<String>(
-            PdfDocumentBuilder,
+            PdfDocumentExtractor,
             "extractText",
             pdfDocument,
             textStripper,
@@ -107,7 +108,7 @@ internal class PdfDocumentBuilderTest {
         val pdfDocument = Loader.loadPDF(ClassPathResource(PDF_THREE_IMAGES_TEST_PDF).file)
 
         val actual = ReflectionTestUtils.invokeMethod<Map<Int, BufferedImage>>(
-            PdfDocumentBuilder,
+            PdfDocumentExtractor,
             "extractImages",
             pdfDocument,
             pageIndex

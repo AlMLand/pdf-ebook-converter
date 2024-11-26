@@ -3,6 +3,8 @@ package com.almland.pdfebookconverter.application.aggregate.expractor
 import com.almland.pdfebookconverter.domain.pdffilestructure.Line
 import com.almland.pdfebookconverter.domain.pdffilestructure.Page
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.runBlocking
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.text.PDFTextStripper
@@ -12,7 +14,7 @@ import org.apache.pdfbox.text.TextPosition
  * Stripper allows mark lines as bold or not, after processing contains a collection with all Pages.
  */
 @Suppress("TooManyFunctions")
-internal class PDFCustomStripper : PDFTextStripper() {
+internal class PDFCustomStripper(private val context: CoroutineContext) : PDFTextStripper() {
 
     companion object {
         private const val TEXT_POSITION_FIRST = 0
@@ -47,7 +49,7 @@ internal class PDFCustomStripper : PDFTextStripper() {
     /**
      * Additional behavior: set pageIndex to 0, set currentPage to null, group extracted lines.
      */
-    override fun endDocument(document: PDDocument?) {
+    override fun endDocument(document: PDDocument?) = runBlocking(context) {
         pageIndex.set(0)
         currentPage = null
         groupLines(pages)
