@@ -19,7 +19,7 @@ internal open class PdfDocumentAggregator(
 
     override suspend fun create(
         target: String, fileName: String, content: InputStream, context: CoroutineContext
-    ): InputStream = PdfDocumentExtractor.create(content, context).let { pdfDocument ->
+    ): InputStream = PdfDocumentExtractor.extract(content, context).let { pdfDocument ->
         if (target == FB2.target) fB2Creator.create(pdfDocument, context)
         else ePUBCreator.create(pdfDocument, context)
     }

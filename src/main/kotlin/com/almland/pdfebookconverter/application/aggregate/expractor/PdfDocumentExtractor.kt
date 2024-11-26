@@ -1,10 +1,10 @@
 package com.almland.pdfebookconverter.application.aggregate.expractor
 
 import com.almland.pdfebookconverter.domain.PdfDocument
-import com.almland.pdfebookconverter.domain.pdffilestructure.Image
-import com.almland.pdfebookconverter.domain.pdffilestructure.Page
-import com.almland.pdfebookconverter.domain.pdfmetainfo.Author
-import com.almland.pdfebookconverter.domain.pdfmetainfo.Description
+import com.almland.pdfebookconverter.domain.metainfo.Author
+import com.almland.pdfebookconverter.domain.metainfo.Description
+import com.almland.pdfebookconverter.domain.structure.Image
+import com.almland.pdfebookconverter.domain.structure.Page
 import java.io.InputStream
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,7 @@ internal object PdfDocumentExtractor {
      * @param context current coroutine context
      * @return domain object PdfDocument
      */
-    suspend fun create(content: InputStream, context: CoroutineContext): PdfDocument =
+    suspend fun extract(content: InputStream, context: CoroutineContext): PdfDocument =
         withContext(context + Dispatchers.Default) {
             val bufferedContent = content.readAllBytes()
             PdfDocument(

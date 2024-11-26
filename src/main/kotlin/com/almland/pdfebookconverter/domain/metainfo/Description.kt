@@ -1,3 +1,3 @@
-package com.almland.pdfebookconverter.domain.pdfmetainfo
+package com.almland.pdfebookconverter.domain.metainfo
 
 internal data class Description(val title: String, val author: Author)

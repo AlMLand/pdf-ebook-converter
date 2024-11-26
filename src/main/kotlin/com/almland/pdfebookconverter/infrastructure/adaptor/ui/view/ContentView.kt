@@ -70,7 +70,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
                 ComboBox<FileTarget>().apply {
                     comboBox = this
                     setWidthFull()
-                    placeholder = "convert T to"
+                    placeholder = "convert PDF to"
                     setItems(FileTarget.entries)
                     addValueChangeListener { upload.isVisible = true }
                     addThemeVariants(ComboBoxVariant.LUMO_ALIGN_CENTER)

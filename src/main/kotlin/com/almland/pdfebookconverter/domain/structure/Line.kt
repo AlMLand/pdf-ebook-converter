@@ -1,4 +1,4 @@
-package com.almland.pdfebookconverter.domain.pdffilestructure
+package com.almland.pdfebookconverter.domain.structure
 
 internal data class Line(
     var text: String?,

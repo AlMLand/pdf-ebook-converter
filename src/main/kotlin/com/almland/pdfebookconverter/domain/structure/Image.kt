@@ -1,8 +1,8 @@
-package com.almland.pdfebookconverter.domain.pdffilestructure
+package com.almland.pdfebookconverter.domain.structure
 
 import java.awt.image.BufferedImage
 
 internal data class Image(
-    val order: Int,
+    val sequenceOrder: Int,
     var bufferedImage: BufferedImage
 )
