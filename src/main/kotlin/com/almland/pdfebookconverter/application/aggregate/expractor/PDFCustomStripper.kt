@@ -1,7 +1,7 @@
 package com.almland.pdfebookconverter.application.aggregate.expractor
 
-import com.almland.pdfebookconverter.domain.pdffilestructure.Line
-import com.almland.pdfebookconverter.domain.pdffilestructure.Page
+import com.almland.pdfebookconverter.domain.structure.Line
+import com.almland.pdfebookconverter.domain.structure.Page
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.runBlocking

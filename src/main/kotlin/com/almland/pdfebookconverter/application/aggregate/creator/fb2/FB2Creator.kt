@@ -18,8 +18,8 @@ import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.ST
 import com.almland.pdfebookconverter.application.aggregate.creator.fb2.FB2Tag.TITLE_INFO
 import com.almland.pdfebookconverter.application.port.creator.Creator
 import com.almland.pdfebookconverter.domain.PdfDocument
-import com.almland.pdfebookconverter.domain.pdffilestructure.Image
-import com.almland.pdfebookconverter.domain.pdffilestructure.Line
+import com.almland.pdfebookconverter.domain.structure.Image
+import com.almland.pdfebookconverter.domain.structure.Line
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -177,13 +177,13 @@ internal open class FB2Creator : Creator {
                 document.createElement(PARAGRAPH.tag).apply {
                     appendChild(
                         document.createElement(IMAGE.tag).apply {
-                            setAttribute("l:href", "#image_${image.hashCode()}-${image.order}")
+                            setAttribute("l:href", "#image_${image.hashCode()}-${image.sequenceOrder}")
                         }
                     )
                     section.appendChild(this)
                 }
                 document.createElement(BINARY.tag).apply {
-                    setAttribute("id", "image_${image.hashCode()}-${image.order}")
+                    setAttribute("id", "image_${image.hashCode()}-${image.sequenceOrder}")
                     setAttribute("content-type", "image/$CONTENT_TYPE")
                     appendChild(document.createTextNode(convertImageToBase64(image.bufferedImage)))
                     root.appendChild(this)
