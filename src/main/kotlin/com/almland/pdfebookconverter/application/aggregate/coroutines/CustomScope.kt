@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory
 
 internal class CustomScope(private val onThrowable: () -> Unit) : CoroutineScope {
 
+    companion object {
+        private const val MIN_ALLOWED_LENGTH = 3
+        private const val DEFAULT_SUPPRESSED = ""
+    }
+
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     private val parentJob = Job()
@@ -28,7 +33,7 @@ internal class CustomScope(private val onThrowable: () -> Unit) : CoroutineScope
     private fun getSuppressed(throwable: Throwable): String =
         throwable.suppressed
             .contentToString()
-            .takeIf { suppressed -> suppressed.length > 2 }
+            .takeIf { suppressed -> suppressed.length >= MIN_ALLOWED_LENGTH }
             ?.let { suppressed -> " with suppressed $suppressed" }
-            ?: ""
+            ?: DEFAULT_SUPPRESSED
 }

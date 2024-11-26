@@ -115,15 +115,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
     }
 
     private fun createDownloadLink(memory: MemoryBuffer, uI: UI) {
-        coroutineScope = CustomScope {
-            uI.access {
-                upload.clearFileList()
-                progressBar.removeFromParent()
-                Notification
-                    .show(ERROR_NOTIFICATION_MESSAGE, ERROR_NOTIFICATION_DURATION, BOTTOM_CENTER)
-                    .apply { addThemeVariants(NotificationVariant.LUMO_ERROR) }
-            }
-        }
+        coroutineScope = CustomScope { handlingCoroutineException(uI) }
         coroutineScope.launch(Dispatchers.Default) {
             val target = comboBox.value.target
             val fileName = getFileName(target, memory)
@@ -134,6 +126,16 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
                 layout.add(createAnchor(inputStream, target, memory))
                 if (suggestions.isNotEmpty()) layout.add(createSuggestion(suggestions))
             }
+        }
+    }
+
+    private fun handlingCoroutineException(uI: UI) {
+        uI.access {
+            upload.clearFileList()
+            progressBar.removeFromParent()
+            Notification
+                .show(ERROR_NOTIFICATION_MESSAGE, ERROR_NOTIFICATION_DURATION, BOTTOM_CENTER)
+                .apply { addThemeVariants(NotificationVariant.LUMO_ERROR) }
         }
     }
 
