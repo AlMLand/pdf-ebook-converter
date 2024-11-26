@@ -1,8 +1,0 @@
-package com.almland.pdfebookconverter.infrastructure.configuration
-
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.EnableAspectJAutoProxy
-
-@Configuration
-@EnableAspectJAutoProxy
-internal class AOPConfiguration

@@ -23,7 +23,7 @@ internal class LoggingInterceptor : ContinuationInterceptor {
 
         override fun resumeWith(result: Result<T>) {
             if (context.isActive.not()) {
-                logger.info("Current thread: {}, Coroutine cancelled, not resuming.", Thread.currentThread().name)
+                logger.info("Current thread: {}, Coroutine cancelled, not resumed.", Thread.currentThread().name)
                 return
             }
 
