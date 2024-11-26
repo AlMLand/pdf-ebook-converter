@@ -3,6 +3,7 @@ package com.almland.pdfebookconverter.infrastructure.adaptor.ui.view
 import com.almland.pdfebookconverter.application.aggregate.coroutines.CustomScope
 import com.almland.pdfebookconverter.application.port.aggregator.AggregateQueryPort
 import com.almland.pdfebookconverter.infrastructure.adaptor.ui.MainLayout
+import com.almland.pdfebookconverter.infrastructure.adaptor.ui.dto.Download
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.UI
@@ -32,6 +33,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -119,12 +121,12 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         coroutineScope.launch(Dispatchers.Default) {
             val target = comboBox.value.target
             val fileName = getFileName(target, memory)
-            val suggestions = getSuggestionsAsync(fileName, coroutineContext).await()
-            val inputStream = getDownloadContentAsync(fileName, target, memory, coroutineContext).await()
+            val download = getDownload(fileName, target, memory, coroutineContext)
+
             uI.access {
                 progressBar.removeFromParent()
-                layout.add(createAnchor(inputStream, target, memory))
-                if (suggestions.isNotEmpty()) layout.add(createSuggestion(suggestions))
+                layout.add(createAnchor(download.content, target, memory))
+                if (download.suggestions.isNotEmpty()) layout.add(createSuggestion(download.suggestions))
             }
         }
     }
@@ -139,7 +141,13 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         }
     }
 
-    private fun getDownloadContentAsync(
+    private suspend fun getDownload(
+        fileName: String, target: String, memory: MemoryBuffer, context: CoroutineContext
+    ): Download = Download(
+        awaitAll(getSuggestions(fileName, context), getDownloadContent(fileName, target, memory, context))
+    )
+
+    private fun getDownloadContent(
         fileName: String, target: String, memory: MemoryBuffer, context: CoroutineContext
     ): Deferred<InputStream> =
         coroutineScope.async {
@@ -147,7 +155,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
             else aggregateQueryPort.create(target, fileName, memory.inputStream, context)
         }
 
-    private fun getSuggestionsAsync(fileName: String, context: CoroutineContext): Deferred<Collection<String>> =
+    private fun getSuggestions(fileName: String, context: CoroutineContext): Deferred<Collection<String>> =
         coroutineScope.async {
             if (isActive.not()) return@async listOf()
             else aggregateQueryPort.getSuggestions(fileName, context)
