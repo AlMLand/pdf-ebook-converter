@@ -1,7 +1,7 @@
 package com.almland.pdfebookconverter.application.aggregate
 
 import com.almland.pdfebookconverter.application.aggregate.expractor.PdfDocumentExtractor
-import com.almland.pdfebookconverter.application.port.aggregator.AggregateQueryPort
+import com.almland.pdfebookconverter.application.port.aggregator.AggregatePort
 import com.almland.pdfebookconverter.application.port.creator.Creator
 import com.almland.pdfebookconverter.application.port.outbound.AIPort
 import com.almland.pdfebookconverter.domain.FileTarget.FB2
@@ -12,7 +12,7 @@ internal open class PdfDocumentAggregator(
     private val aiPort: AIPort,
     private val fB2Creator: Creator,
     private val ePUBCreator: Creator
-) : AggregateQueryPort {
+) : AggregatePort {
 
     override suspend fun getSuggestions(fileName: String, context: CoroutineContext): Collection<String> =
         aiPort.call(fileName, context)
