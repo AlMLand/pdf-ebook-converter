@@ -1,7 +1,7 @@
 package com.almland.pdfebookconverter.infrastructure.adaptor.ui.view
 
 import com.almland.pdfebookconverter.application.aggregate.coroutines.CustomScope
-import com.almland.pdfebookconverter.application.port.aggregator.AggregateQueryPort
+import com.almland.pdfebookconverter.application.port.aggregator.AggregatePort
 import com.almland.pdfebookconverter.infrastructure.adaptor.ui.MainLayout
 import com.almland.pdfebookconverter.infrastructure.adaptor.ui.dto.DownloadDTO
 import com.vaadin.flow.component.Component
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(DelicateCoroutinesApi::class)
 @Route(value = ContentView.PATH, layout = MainLayout::class)
-internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) : Composite<Component>() {
+internal class ContentView(private val aggregatePort: AggregatePort) : Composite<Component>() {
 
     companion object {
         const val PATH = ""
@@ -152,13 +152,13 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
     ): Deferred<InputStream> =
         coroutineScope.async {
             if (isActive.not()) return@async InputStream.nullInputStream()
-            else aggregateQueryPort.create(target, fileName, memory.inputStream, context)
+            else aggregatePort.create(target, fileName, memory.inputStream, context)
         }
 
     private fun getSuggestions(fileName: String, context: CoroutineContext): Deferred<Collection<String>> =
         coroutineScope.async {
             if (isActive.not()) return@async listOf()
-            else aggregateQueryPort.getSuggestions(fileName, context)
+            else aggregatePort.getSuggestions(fileName, context)
         }
 
     private fun createSuggestion(suggestions: Collection<String>): Component =
