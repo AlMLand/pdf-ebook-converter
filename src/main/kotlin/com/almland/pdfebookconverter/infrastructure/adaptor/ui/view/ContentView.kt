@@ -3,7 +3,7 @@ package com.almland.pdfebookconverter.infrastructure.adaptor.ui.view
 import com.almland.pdfebookconverter.application.aggregate.coroutines.CustomScope
 import com.almland.pdfebookconverter.application.port.aggregator.AggregateQueryPort
 import com.almland.pdfebookconverter.infrastructure.adaptor.ui.MainLayout
-import com.almland.pdfebookconverter.infrastructure.adaptor.ui.dto.Download
+import com.almland.pdfebookconverter.infrastructure.adaptor.ui.dto.DownloadDTO
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.UI
@@ -121,11 +121,11 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         coroutineScope.launch(Dispatchers.Default) {
             val target = comboBox.value.target
             val fileName = getFileName(target, memory)
-            val download = getDownload(fileName, target, memory, coroutineContext)
+            val download = getDownloadDTO(fileName, target, memory, coroutineContext)
 
             uI.access {
                 progressBar.removeFromParent()
-                layout.add(createAnchor(download.content, target, memory))
+                layout.add(createLink(download.content, target, memory))
                 if (download.suggestions.isNotEmpty()) layout.add(createSuggestion(download.suggestions))
             }
         }
@@ -141,9 +141,9 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
         }
     }
 
-    private suspend fun getDownload(
+    private suspend fun getDownloadDTO(
         fileName: String, target: String, memory: MemoryBuffer, context: CoroutineContext
-    ): Download = Download(
+    ): DownloadDTO = DownloadDTO(
         awaitAll(getSuggestions(fileName, context), getDownloadContent(fileName, target, memory, context))
     )
 
@@ -174,7 +174,7 @@ internal class ContentView(private val aggregateQueryPort: AggregateQueryPort) :
             style.setFlexWrap(Style.FlexWrap.WRAP)
         }
 
-    private fun createAnchor(inputStream: InputStream, target: String, memory: MemoryBuffer): Anchor =
+    private fun createLink(inputStream: InputStream, target: String, memory: MemoryBuffer): Anchor =
         Anchor(createStreamResource(inputStream, target, memory), null).apply {
             anchor = this
             setWidthFull()
