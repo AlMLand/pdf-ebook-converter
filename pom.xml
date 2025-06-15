@@ -14,6 +14,7 @@
     <artifactId>pdf-ebook-converter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>pdf-ebook-converter</name>
+    <packaging>jar</packaging>
     <description>pdf to people readable format converter</description>
 
     <properties>
@@ -141,6 +142,64 @@
                         <version>${kotlin.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.46.0</version>
+                <configuration>
+                    <!--  <dockerHost>http://127.0.0.1:2375</dockerHost> -->
+                    <!--  this is for Mac and Amazon Linux -->
+                    <!-- <dockerHost>unix:///var/run/docker.sock</dockerHost> -->
+                    <verbose>true</verbose>
+                    <!-- Needed if pushing to DockerHub: preferred to store these in local environment (see the course) -->
+                    <!--                    <authConfig>-->
+                    <!--                        <username>YOUR-USERNAME</username>-->
+                    <!--                        <password>YOUR-PASSWORD</password>-->
+                    <!--                    </authConfig>-->
+                    <images>
+                        <image>
+                            <!-- push to local registry-->
+                            <!-- image pull: docker pull localhost:5000/pdf-ebook-converter:0.0.1-SNAPSHOT -->
+                            <name>localhost:5000/pdf-ebook-converter</name>
+                            <build>
+                                <dockerFileDir>${project.basedir}/src/main/docker/</dockerFileDir>
+                                <!--copies Jar to the maven directory (uses Assembly system)-->
+                                <assembly>
+                                    <descriptorRef>artifact</descriptorRef>
+                                </assembly>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>pdf-ebook-converter</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+            need's to avoid error: Deployment failed: repository element was not specified in the POM inside
+            distributionManagement element or in -DaltDeploymentRepository=id::url parameter
+            -->
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -31,3 +31,7 @@ resilience4j:
 
 vaadin:
   launch-browser: "true"
+
+logging:
+  file:
+    name: "logs/pdf-ebook-converter.log"
