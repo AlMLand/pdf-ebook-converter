@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdf-app
+  labels:
+    app: pdf-app
+spec:
+  replicas: 3
+  minReadySeconds: 30
+  selector:
+    matchLabels:
+      app: pdf-app
+  template:
+    metadata:
+      labels:
+        app: pdf-app
+    spec:
+      containers:
+        - name: pdf-app
+          image: localhost:5000/pdf-ebook-converter:0.0.8-SNAPSHOT
+          ports:
+            - containerPort: 8080

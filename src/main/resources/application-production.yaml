@@ -14,7 +14,7 @@ spring:
           model: "gpt-4o-mini"
       api-key: "${OPENAI_API_KEY}"
   datasource:
-    url: jdbc:postgresql://localhost:5432/pdf-ebook-converter
+    url: jdbc:postgresql://pdf-postgresql-svc:8080/pdf-ebook-converter
     username: username
     password: password
 

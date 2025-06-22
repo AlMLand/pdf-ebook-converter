@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdf-postgresql
+  labels:
+    app: pdf-postgresql
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pdf-postgresql
+  template:
+    metadata:
+      labels:
+        app: pdf-postgresql
+    spec:
+      containers:
+        - name: pdf-postgresql
+          image: postgres:17.5-alpine3.22
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: username
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: pdf-ebook-converter

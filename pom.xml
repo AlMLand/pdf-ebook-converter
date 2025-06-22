@@ -12,7 +12,7 @@
 
     <groupId>com.almland</groupId>
     <artifactId>pdf-ebook-converter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.8-SNAPSHOT</version>
     <name>pdf-ebook-converter</name>
     <packaging>jar</packaging>
     <description>pdf to people readable format converter</description>
@@ -22,6 +22,7 @@
         <pdfbox.version>3.0.3</pdfbox.version>
         <kotlin.version>1.9.25</kotlin.version>
         <vaadin.version>24.5.2</vaadin.version>
+        <postgres.verion>42.7.7</postgres.verion>
         <spring-ai.version>1.0.0-M3</spring-ai.version>
         <jai.imageio.version>1.4.0</jai.imageio.version>
         <kotlinx.coroutines.core.version>1.9.0</kotlinx.coroutines.core.version>
@@ -63,6 +64,10 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-spring-boot-starter</artifactId>
@@ -107,6 +112,12 @@
             <groupId>com.github.jai-imageio</groupId>
             <artifactId>jai-imageio-jpeg2000</artifactId>
             <version>${jai.imageio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgres.verion}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>

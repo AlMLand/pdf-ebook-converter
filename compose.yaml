@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:17.5-alpine3.22
+    container_name: pdf-postgres
+    restart: on-failure
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pdf-ebook-converter
