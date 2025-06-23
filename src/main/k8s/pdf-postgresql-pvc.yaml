@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pdf-postgresql-pvc
+spec:
+  # like a selector in PersistentVolumeClaim for some PersistentVolume
+  storageClassName: pdf-postgresql-storage-class
+  resources:
+    requests:
+      storage: 512Mi
+  accessModes:
+    - ReadWriteOnce

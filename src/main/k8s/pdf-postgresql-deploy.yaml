@@ -5,7 +5,7 @@ metadata:
   labels:
     app: pdf-postgresql
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: pdf-postgresql
@@ -19,6 +19,10 @@ spec:
           image: postgres:17.5-alpine3.22
           ports:
             - containerPort: 5432
+          # volumeMounts are used to mount the persistent storage inside the container
+          volumeMounts:
+            - name: pdf-postgresql-storage
+              mountPath: /var/lib/postgresql/data
           env:
             - name: POSTGRES_USER
               value: username
@@ -26,3 +30,8 @@ spec:
               value: password
             - name: POSTGRES_DB
               value: pdf-ebook-converter
+      # volumes is used to define which kind of the storage will be used, the name must match the one defined in the volumeMounts
+      volumes:
+        - name: pdf-postgresql-storage
+          persistentVolumeClaim:
+            claimName: pdf-postgresql-pvc
