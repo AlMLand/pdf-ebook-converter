@@ -30,6 +30,13 @@ spec:
               value: password
             - name: POSTGRES_DB
               value: pdf-ebook-converter
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: 200m
+            limits:
+              memory: 400Mi
+              cpu: 300m
       # volumes is used to define which kind of the storage will be used, the name must match the one defined in the volumeMounts
       volumes:
         - name: pdf-postgresql-storage
