@@ -32,11 +32,11 @@ spec:
               value: pdf-ebook-converter
           resources:
             requests:
-              memory: 300Mi
-              cpu: 200m
+              memory: 100Mi
+              cpu: 50m
             limits:
-              memory: 400Mi
-              cpu: 300m
+              memory: 150Mi
+              cpu: 100m
       # volumes is used to define which kind of the storage will be used, the name must match the one defined in the volumeMounts
       volumes:
         - name: pdf-postgresql-storage
