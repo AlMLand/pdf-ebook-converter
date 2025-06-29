@@ -17,9 +17,21 @@ spec:
     spec:
       containers:
         - name: pdf-app
-          image: localhost:5000/pdf-ebook-converter:0.0.8-SNAPSHOT
+          image: localhost:5000/pdf-ebook-converter:0.0.9-SNAPSHOT
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 240
+            periodSeconds: 5
           resources:
             requests:
               memory: 300Mi

@@ -23,6 +23,26 @@ spec:
           volumeMounts:
             - name: pdf-postgresql-storage
               mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - username
+                - -d
+                - pdf-ebook-converter
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - username
+                - -d
+                - pdf-ebook-converter
+            initialDelaySeconds: 60
+            periodSeconds: 20
           env:
             - name: POSTGRES_USER
               value: username

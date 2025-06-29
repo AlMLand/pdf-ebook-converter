@@ -12,7 +12,7 @@
 
     <groupId>com.almland</groupId>
     <artifactId>pdf-ebook-converter</artifactId>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>0.0.9-SNAPSHOT</version>
     <name>pdf-ebook-converter</name>
     <packaging>jar</packaging>
     <description>pdf to people readable format converter</description>
@@ -75,6 +75,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.ai</groupId>

@@ -18,6 +18,16 @@ spring:
     username: username
     password: password
 
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  livenessState:
+    enabled: true
+  readinessState:
+    enabled: true
+
 resilience4j:
   circuitbreaker:
     configs:
