@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pdf-app-configmap-servlet-multipart
+  namespace: default
+immutable: true
+data:
+  SERVLET_MAX_FILE_SIZE_FROM_CM: "20MB"
+  SERVLET_MAX_REQUEST_SIZE_FROM_CM: "20MB"

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pdf-app-configmap-management
+  namespace: default
+immutable: true
+data:
+  # a file with the name application-management.properties will be created in the pod,
+  # all the properties will be written to this file and used by the application.
+  application-management.properties: |
+    management.endpoint.health.probes.enabled: "true"
+    management.livenessState.enabled: "true"
+    management.readinessState.enabled: "true"

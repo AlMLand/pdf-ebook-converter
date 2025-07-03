@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pdf-app-configmap-main
+  namespace: default
+immutable: true
+data:
+  OPENAI_RETRY_ON_CLIENT_ERROR: "true"
+  OPENAI_MODEL: "gpt_4o_mini"
+  FAILURE_RATE_THRESHOLD: "50"
+  MINIMUM_NUMBER_OF_CALLS: "6"
+  PERMITTED_NUMBER_OF_CALLS_IN_HALF_OPEN_STATE: "10"
+  AUTOMATIC_TRANSITION_FROM_OPEN_TO_HALF_OPEN_ENABLED: "true"
+  WAIT_DURATION_IN_OPEN_STATE: "15s"
+  SLIDING_WINDOW_SIZE: "50"
+  SLIDING_WINDOW_TYPE: "count_based"
+  VAADIN_LAUNCH_BROWSER: "false"
+  LOG_FILE_NAME: "logs/pdf-ebook-converter.log"

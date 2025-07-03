@@ -3,49 +3,41 @@ spring:
     name: "pdf-ebook-converter"
   servlet:
     multipart:
-      max-file-size: "20MB"
-      max-request-size: "20MB"
+      max-file-size: ${SERVLET_MAX_FILE_SIZE:10MB}
+      max-request-size: ${SERVLET_MAX_REQUEST_SIZE:10MB}
   ai:
     retry:
-      on-client-errors: "true"
+      on-client-errors: ${OPENAI_RETRY_ON_CLIENT_ERROR}
     openai:
       chat:
         options:
-          model: "gpt-4o-mini"
-      api-key: "${OPENAI_API_KEY}"
+          model: ${OPENAI_MODEL}
+      api-key: ${OPENAI_API_KEY}
   datasource:
-    url: jdbc:postgresql://pdf-postgresql-svc:8080/pdf-ebook-converter
-    username: username
-    password: password
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
 
-management:
-  endpoint:
-    health:
-      probes:
-        enabled: true
-  livenessState:
-    enabled: true
-  readinessState:
-    enabled: true
+# spring boot actuator configuration will be set from the configMap "pdf-app-configmap-management"
 
 resilience4j:
   circuitbreaker:
     configs:
       default:
-        failure-rate-threshold: "50"
-        minimum-number-of-calls: "6"
-        permitted-number-of-calls-in-half-open-state: "10"
-        automatic-transition-from-open-to-half-open-enabled: "true"
-        wait-duration-in-open-state: "15s"
-        sliding-window-size: "50"
-        sliding-window-type: "count_based"
+        failure-rate-threshold: ${FAILURE_RATE_THRESHOLD}
+        minimum-number-of-calls: ${MINIMUM_NUMBER_OF_CALLS}
+        permitted-number-of-calls-in-half-open-state: ${PERMITTED_NUMBER_OF_CALLS_IN_HALF_OPEN_STATE}
+        automatic-transition-from-open-to-half-open-enabled: ${AUTOMATIC_TRANSITION_FROM_OPEN_TO_HALF_OPEN_ENABLED}
+        wait-duration-in-open-state: ${WAIT_DURATION_IN_OPEN_STATE}
+        sliding-window-size: ${SLIDING_WINDOW_SIZE}
+        sliding-window-type: ${SLIDING_WINDOW_TYPE}
     instances:
       aiPort:
         base-config: "default"
 
 vaadin:
-  launch-browser: "true"
+  launch-browser: ${VAADIN_LAUNCH_BROWSER}
 
 logging:
   file:
-    name: "logs/pdf-ebook-converter.log"
+    name: ${LOG_FILE_NAME}

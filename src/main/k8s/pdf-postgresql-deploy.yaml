@@ -26,30 +26,22 @@ spec:
           readinessProbe:
             exec:
               command:
-                - pg_isready
-                - -U
-                - username
-                - -d
-                - pdf-ebook-converter
+                - sh
+                - -c
+                - pg_isready -U "$DATASOURCE_USERNAME" -d "$DATASOURCE_DATABASE"
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             exec:
               command:
-                - pg_isready
-                - -U
-                - username
-                - -d
-                - pdf-ebook-converter
+                - sh
+                - -c
+                - pg_isready -U "$DATASOURCE_USERNAME" -d "$DATASOURCE_DATABASE"
             initialDelaySeconds: 60
             periodSeconds: 20
-          env:
-            - name: POSTGRES_USER
-              value: username
-            - name: POSTGRES_PASSWORD
-              value: password
-            - name: POSTGRES_DB
-              value: pdf-ebook-converter
+          envFrom:
+            - secretRef:
+                name: pdf-postgresql-secret
           resources:
             requests:
               memory: 150Mi

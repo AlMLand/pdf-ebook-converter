@@ -5,8 +5,8 @@ metadata:
   labels:
     app: pdf-app
 spec:
-  replicas: 3
-  minReadySeconds: 30
+  replicas: 1
+  minReadySeconds: 10
   selector:
     matchLabels:
       app: pdf-app
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: pdf-app
-          image: localhost:5000/pdf-ebook-converter:0.0.9-SNAPSHOT
+          image: localhost:5000/pdf-ebook-converter:0.0.13-SNAPSHOT
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -39,3 +39,36 @@ spec:
             limits:
               memory: 400Mi
               cpu: 500m
+          # set environment variables from the configMap (variant 1)
+          envFrom:
+            - configMapRef:
+                name: pdf-app-configmap-main
+            - secretRef:
+                name: pdf-app-secret
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: production,management
+            # # set environment variables from the configMap (variant 2)
+            - name: SERVLET_MAX_FILE_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: pdf-app-configmap-servlet-multipart
+                  key: SERVLET_MAX_FILE_SIZE_FROM_CM
+            - name: SERVLET_MAX_REQUEST_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: pdf-app-configmap-servlet-multipart
+                  key: SERVLET_MAX_REQUEST_SIZE_FROM_CM
+          # mount files with application-*.properties from the configMap (variant 3) and use them in the application (profile "management")
+          volumeMounts:
+            - name: pdf-app-configmap-management
+              mountPath: /usr/local/apps/configuration
+              readOnly: true
+      # mount files with application-*.properties from the configMap (variant 3) and use them in the application (profile "management")
+      volumes:
+        - name: pdf-app-configmap-management
+          configMap:
+            name: pdf-app-configmap-management
+            items:
+              - key: application-management.properties
+                path: application-management.properties
