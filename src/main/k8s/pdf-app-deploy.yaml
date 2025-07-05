@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: pdf-app
-          image: localhost:5000/pdf-ebook-converter:0.0.13-SNAPSHOT
+          image: localhost:5000/pdf-ebook-converter:0.0.15-SNAPSHOT
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -42,7 +42,7 @@ spec:
           # set environment variables from the configMap (variant 1)
           envFrom:
             - configMapRef:
-                name: pdf-app-configmap-main
+                name: pdf-app-cm-main-properties
             - secretRef:
                 name: pdf-app-secret
           env:
@@ -52,23 +52,23 @@ spec:
             - name: SERVLET_MAX_FILE_SIZE
               valueFrom:
                 configMapKeyRef:
-                  name: pdf-app-configmap-servlet-multipart
+                  name: pdf-app-cm-servlet-properties
                   key: SERVLET_MAX_FILE_SIZE_FROM_CM
             - name: SERVLET_MAX_REQUEST_SIZE
               valueFrom:
                 configMapKeyRef:
-                  name: pdf-app-configmap-servlet-multipart
+                  name: pdf-app-cm-servlet-properties
                   key: SERVLET_MAX_REQUEST_SIZE_FROM_CM
           # mount files with application-*.properties from the configMap (variant 3) and use them in the application (profile "management")
           volumeMounts:
-            - name: pdf-app-configmap-management
-              mountPath: /usr/local/apps/configuration
+            - name: pdf-app-cm-management-profile
+              mountPath: /usr/local/apps/configuration/profiles/management
               readOnly: true
       # mount files with application-*.properties from the configMap (variant 3) and use them in the application (profile "management")
       volumes:
-        - name: pdf-app-configmap-management
+        - name: pdf-app-cm-management-profile
           configMap:
-            name: pdf-app-configmap-management
+            name: pdf-app-cm-management-profile
             items:
               - key: application-management.properties
                 path: application-management.properties
