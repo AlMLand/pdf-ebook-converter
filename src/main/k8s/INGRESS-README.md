@@ -1,6 +1,14 @@
-# Create authentication secret for admin access
+# Ingress for Kubernetes
 
-## Ingress Configuration for Kubernetes
+1. https://kubernetes.github.io/ingress-nginx/deploy/
+    - before applying this ingress, install nginx ingress controller with:
+       ```
+       kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.3/deploy/static/provider/cloud/deploy.yaml
+       ```
+
+2. create an admin secret, see `INGRESS-README.md`
+
+# Create authentication secret
 
 ```
 kubectl create secret generic ingress-credentials --from-file=auth
