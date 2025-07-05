@@ -1,0 +1,38 @@
+# 1. https://kubernetes.github.io/ingress-nginx/deploy/
+#     before apply this ingress, install nginx ingress controller with:
+#     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.3/deploy/static/provider/cloud/deploy.yaml
+# 2. create an admin secret, see INGRESS-README.md
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pdf-ingress-secure
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/auth-type: "basic"
+    nginx.ingress.kubernetes.io/auth-secret: "ingress-credentials"
+    nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: pdf-app-svc
+                port:
+                  number: 8080
+    # the same host only, for example - using different hosts
+    - host: localhost
+      http:
+        paths:
+          - pathType: Prefix
+            path: /actuator/health/liveness
+            backend:
+              service:
+                name: pdf-app-svc
+                port:
+                  number: 8080
