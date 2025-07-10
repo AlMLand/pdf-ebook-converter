@@ -30,7 +30,10 @@ spec:
                 - -c
                 - pg_isready -U "$DATASOURCE_USERNAME" -d "$DATASOURCE_DATABASE"
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 1
+            successThreshold: 1
           livenessProbe:
             exec:
               command:
@@ -39,6 +42,9 @@ spec:
                 - pg_isready -U "$DATASOURCE_USERNAME" -d "$DATASOURCE_DATABASE"
             initialDelaySeconds: 60
             periodSeconds: 20
+            timeoutSeconds: 4
+            failureThreshold: 2
+            successThreshold: 1
           envFrom:
             - secretRef:
                 name: pdf-postgresql-secret

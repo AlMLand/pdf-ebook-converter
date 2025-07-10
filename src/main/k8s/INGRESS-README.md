@@ -6,7 +6,7 @@
        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.3/deploy/static/provider/cloud/deploy.yaml
        ```
 
-2. create an admin secret, see `INGRESS-README.md`
+2. create an admin secret
 
 # Create authentication secret
 
