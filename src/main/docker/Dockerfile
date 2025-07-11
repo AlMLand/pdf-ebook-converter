@@ -6,7 +6,7 @@ RUN mkdir logs
 
 VOLUME logs
 
-ADD maven/pdf-ebook-converter-0.0.15-SNAPSHOT.jar app.jar
+ADD maven/pdf-ebook-converter-0.0.16-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 CMD ["java", "-jar", "-Xms400m", "-Xmx400m", "app.jar"]

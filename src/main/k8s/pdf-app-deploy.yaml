@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: pdf-app
-          image: localhost:5000/pdf-ebook-converter:0.0.15-SNAPSHOT
+          image: localhost:5000/pdf-ebook-converter:0.0.16-SNAPSHOT
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -52,33 +52,35 @@ spec:
           # set environment variables from the configMap (variant 1)
           envFrom:
             - configMapRef:
-                name: pdf-app-cm-main-properties
+                name: pdf-app-cm-main
             - secretRef:
                 name: pdf-app-secret
           env:
+            - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+              value: file:/usr/local/apps/configuration/profiles/production/
             - name: SPRING_PROFILES_ACTIVE
-              value: production,management
+              value: production
             # # set environment variables from the configMap (variant 2)
             - name: SERVLET_MAX_FILE_SIZE
               valueFrom:
                 configMapKeyRef:
-                  name: pdf-app-cm-servlet-properties
+                  name: pdf-app-cm-servlet
                   key: SERVLET_MAX_FILE_SIZE_FROM_CM
             - name: SERVLET_MAX_REQUEST_SIZE
               valueFrom:
                 configMapKeyRef:
-                  name: pdf-app-cm-servlet-properties
+                  name: pdf-app-cm-servlet
                   key: SERVLET_MAX_REQUEST_SIZE_FROM_CM
-          # mount files with application-*.properties from the configMap (variant 3) and use them in the application (profile "management")
+          # mount files with application-*.yaml from the configMap (variant 3) and use them in the application (profile "production")
           volumeMounts:
-            - name: pdf-app-cm-management-profile
-              mountPath: /usr/local/apps/configuration/profiles/management
+            - name: pdf-app-cm-production-profile
+              mountPath: /usr/local/apps/configuration/profiles/production
               readOnly: true
-      # mount files with application-*.properties from the configMap (variant 3) and use them in the application (profile "management")
+      # mount files with application-*.yaml from the configMap (variant 3) and use them in the application (profile "production")
       volumes:
-        - name: pdf-app-cm-management-profile
+        - name: pdf-app-cm-production-profile
           configMap:
-            name: pdf-app-cm-management-profile
+            name: pdf-app-cm-production-profile
             items:
-              - key: application-management.properties
-                path: application-management.properties
+              - key: application-production.yaml
+                path: application-production.yaml

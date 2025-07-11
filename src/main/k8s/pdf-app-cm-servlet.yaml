@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: pdf-app-cm-servlet-properties
+  name: pdf-app-cm-servlet
   namespace: default
 immutable: false
 data:
