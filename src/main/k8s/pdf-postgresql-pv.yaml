@@ -11,5 +11,4 @@ spec:
     - ReadWriteOnce
   hostPath:
     type: DirectoryOrCreate
-    # this is the path on the host machine (linux) where the data will be stored
-    path: /mnt/kubernetes/pdf-postgresql-storage
+    path: /mnt/c/kubernetes/pdf-postgresql-storage-3

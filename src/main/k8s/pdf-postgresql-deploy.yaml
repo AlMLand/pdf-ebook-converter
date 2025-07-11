@@ -1,11 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: pdf-postgresql
   labels:
     app: pdf-postgresql
 spec:
-  replicas: 1
+  replicas: 3
+  serviceName: pdf-postgresql-svc
   selector:
     matchLabels:
       app: pdf-postgresql
@@ -23,6 +24,8 @@ spec:
           volumeMounts:
             - name: pdf-postgresql-storage
               mountPath: /var/lib/postgresql/data
+            - name: pdf-postgresql-init
+              mountPath: /docker-entrypoint-initdb.d
           readinessProbe:
             exec:
               command:
@@ -60,3 +63,6 @@ spec:
         - name: pdf-postgresql-storage
           persistentVolumeClaim:
             claimName: pdf-postgresql-pvc
+        - name: pdf-postgresql-init
+          secret:
+            secretName: pdf-postgresql-init
