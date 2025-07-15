@@ -1,0 +1,33 @@
+## @param architecture PostgreSQL architecture (`standalone` or `replication`)
+##
+# at the moment: 1 Primary + 2 Replicas
+architecture: replication
+
+global:
+  postgresql:
+    ## @param global.postgresql.auth.username Name for a custom user to create (overrides `auth.username`)
+    ## @param global.postgresql.auth.database Name for a custom database to create (overrides `auth.database`)
+    ## @param global.postgresql.auth.existingSecret Name of existing secret to use for PostgreSQL credentials (overrides `auth.existingSecret`).
+    ## @param global.postgresql.auth.secretKeys.adminPasswordKey Name of key in existing secret to use for PostgreSQL credentials (overrides `auth.secretKeys.adminPasswordKey`). Only used when `global.postgresql.auth.existingSecret` is set.
+    ## @param global.postgresql.auth.secretKeys.userPasswordKey Name of key in existing secret to use for PostgreSQL credentials (overrides `auth.secretKeys.userPasswordKey`). Only used when `global.postgresql.auth.existingSecret` is set.
+    ## @param global.postgresql.auth.secretKeys.replicationPasswordKey Name of key in existing secret to use for PostgreSQL credentials (overrides `auth.secretKeys.replicationPasswordKey`). Only used when `global.postgresql.auth.existingSecret` is set.
+    ##
+    auth:
+      username: custom-postgresql-user
+      database: pdf-ebook-converter
+      existingSecret: postgresql-credentials
+      secretKeys:
+        adminPasswordKey: DATASOURCE_ADMIN_PASSWORD
+        userPasswordKey: DATASOURCE_PASSWORD
+        replicationPasswordKey: DATASOURCE_REPLICATION_PASSWORD
+
+readReplicas:
+  ## @param readReplicas.replicaCount Number of PostgreSQL read only replicas
+  ##
+  replicaCount: 2
+
+replication:
+  ## @param replication.numSynchronousReplicas Number of replicas that will have synchronous replication. Note: Cannot be greater than `readReplicas.replicaCount`.
+  ## ref: https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-SYNCHRONOUS-COMMIT
+  ##
+  numSynchronousReplicas: 2
