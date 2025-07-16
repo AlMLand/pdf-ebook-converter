@@ -1,0 +1,13 @@
+apiVersion: v2
+name: pdf-converter
+description: A Helm chart for pdf ebook converter application
+
+# A chart can be either an 'application' or a 'library' chart.
+type: application
+
+# This is the chart version.
+version: 0.1.0
+
+# This is the version number of the application being deployed.
+# It is recommended to use it with quotes.
+appVersion: "0.0.16-SNAPSHOT"
