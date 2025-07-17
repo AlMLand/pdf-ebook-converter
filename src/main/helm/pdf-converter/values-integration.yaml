@@ -1,0 +1,36 @@
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  tag: 0.0.16-SNAPSHOT
+
+namespace: integration
+
+# Additional volumes on the output Deployment definition.
+volumes:
+  - name: pdf-converter-production-profile-cm
+    configMap:
+      name: pdf-converter-production-profile-cm
+      items:
+        - key: application-integration.yaml
+          path: application-integration.yaml
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts:
+  - name: pdf-converter-production-profile-cm
+    mountPath: /usr/local/apps/configuration/profiles/integration
+    readOnly: true
+
+envFrom:
+  - configMapRef:
+      name: pdf-converter-integration-cm
+  - secretRef:
+      name: postgresql-credentials
+      namespace: postgresql
+
+env:
+  - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+    value: file:/usr/local/apps/configuration/profiles/integration/
+  - name: SPRING_PROFILES_ACTIVE
+    value: integration

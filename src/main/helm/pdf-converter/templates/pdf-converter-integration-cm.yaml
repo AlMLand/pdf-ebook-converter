@@ -1,8 +1,9 @@
+{{- if eq .Values.namespace "integration" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: pdf-converter-cm
-  namespace: default
+  name: pdf-converter-integration-cm
+  namespace: integration
 immutable: false
 data:
   SERVLET_MAX_FILE_SIZE_FROM_CM: "20MB"
@@ -18,3 +19,4 @@ data:
   SLIDING_WINDOW_TYPE: "count_based"
   VAADIN_LAUNCH_BROWSER: "false"
   LOG_FILE_NAME: "logs/pdf-ebook-converter.log"
+{{- end }}

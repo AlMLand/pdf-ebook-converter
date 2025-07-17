@@ -75,35 +75,6 @@ autoscaling:
   targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 70
 
-environment: production
-
 # Additional annotations on the output Deployment definition.
 annotations:
   reloader.stakater.com/auto: "true"
-
-# Additional volumes on the output Deployment definition.
-volumes:
-  - name: pdf-converter-production-cm
-    configMap:
-      name: pdf-converter-production-cm
-      items:
-        - key: application-production.yaml
-          path: application-production.yaml
-
-# Additional volumeMounts on the output Deployment definition.
-volumeMounts:
-  - name: pdf-converter-production-cm
-    mountPath: /usr/local/apps/configuration/profiles/production
-    readOnly: true
-
-envFrom:
-  - configMapRef:
-      name: pdf-converter-cm
-  - secretRef:
-      name: postgresql-credentials
-
-env:
-  - name: SPRING_CONFIG_ADDITIONAL_LOCATION
-    value: file:/usr/local/apps/configuration/profiles/production/
-  - name: SPRING_PROFILES_ACTIVE
-    value: production
