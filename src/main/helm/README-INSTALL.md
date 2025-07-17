@@ -46,12 +46,29 @@ helm repo add stakater https://stakater.github.io/stakater-charts
 
 helm repo update
 
-helm install reloader stakater/reloader -n reloader
+helm install reloader reloader/ -n reloader
 ```
 
 
 
-### 4. Ingress-NGINX chart
+### 4. Reflector chart
+
+This chart deploys the reflector.
+
+- namespace = `reflector`
+
+```
+# if repository is not present
+helm repo add emberstack https://emberstack.github.io/helm-charts
+
+helm repo update
+
+helm install reflector reflector/ -n reflector
+```
+
+
+
+### 5. Ingress-NGINX chart
 
 Install Ingress-NGINX using locally chart and custom values:
 
@@ -68,7 +85,7 @@ helm install ingress-nginx-controller ingress-nginx/ -n ingress-nginx
 
 
 
-### 5. PostgreSQL chart
+### 6. PostgreSQL chart
 
 Install PostgreSQL using locally chart and custom values:
 
@@ -85,14 +102,14 @@ helm install pdf-postgresql postgresql/ --values=./postgresql/custom-values.yaml
 
 
 
-### 6. PDF-Converter chart
+### 7. PDF-Converter chart
 
 Before you begin to install the PDF Converter, create an `pdf-converter-ingress-credentials` secret in your Kubernetes cluster.
 
 Create authentication secret
 
 ```
-kubectl create secret generic pdf-converter-ingress-credentials --from-file=./pdf-converter/auth
+kubectl create secret generic pdf-converter-ingress-credentials --from-file=./pdf-converter/auth `WITH` -n integration `OR` production
 ```
 
 Credentials
