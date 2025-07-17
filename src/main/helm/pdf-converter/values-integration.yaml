@@ -9,16 +9,16 @@ namespace: integration
 
 # Additional volumes on the output Deployment definition.
 volumes:
-  - name: pdf-converter-production-profile-cm
+  - name: pdf-converter-integration-profile-cm
     configMap:
-      name: pdf-converter-production-profile-cm
+      name: pdf-converter-integration-profile-cm
       items:
         - key: application-integration.yaml
           path: application-integration.yaml
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts:
-  - name: pdf-converter-production-profile-cm
+  - name: pdf-converter-integration-profile-cm
     mountPath: /usr/local/apps/configuration/profiles/integration
     readOnly: true
 
@@ -27,7 +27,6 @@ envFrom:
       name: pdf-converter-integration-cm
   - secretRef:
       name: postgresql-credentials
-      namespace: postgresql
 
 env:
   - name: SPRING_CONFIG_ADDITIONAL_LOCATION

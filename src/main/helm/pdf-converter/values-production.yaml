@@ -27,7 +27,6 @@ envFrom:
       name: pdf-converter-production-cm
   - secretRef:
       name: postgresql-credentials
-      namespace: postgresql
 
 env:
   - name: SPRING_CONFIG_ADDITIONAL_LOCATION

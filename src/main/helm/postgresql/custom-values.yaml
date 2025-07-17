@@ -31,3 +31,8 @@ replication:
   ## ref: https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-SYNCHRONOUS-COMMIT
   ##
   numSynchronousReplicas: 2
+
+credentialsSecret:
+  propagateToNamespaces:
+    - integration
+    - production
